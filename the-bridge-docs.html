@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Bridge</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Athiti:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --lora: 'Lora', Georgia, serif;
+    --athiti: 'Athiti', sans-serif;
+  }
+
+  html { font-size: 16px; }
+  body { background: #fff; color: #000; overflow: hidden; height: 100vh; }
+  ::selection { background: #000; color: #fff; }
+
+  /* ---- LAYOUT ---- */
+  .shell {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    width: 350px;
+    min-width: 320px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 3rem 2.5rem 2rem 1rem;
+    overflow-y: auto;
+  }
+  .sidebar .logo {
+    cursor: pointer;
+    margin-bottom: 2rem;
+  }
+  .sidebar .logo img {
+    height: 2rem;
+    width: auto;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  .sidebar nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+  }
+  .sidebar nav a {
+    font-family: var(--athiti);
+    font-weight: 10;
+    font-size: 1rem;
+    color: #000;
+    text-decoration: none;
+    opacity: 1;
+    letter-spacing: -0.01em;
+    transition: opacity 0.2s;
+    text-align: right;
+    cursor: pointer;
+    line-height: 1.2;
+}
+  .sidebar nav a:hover { opacity: 0.5; }
+  .sidebar nav a.active { opacity: 1; }
+
+  /* ---- MAIN CONTENT ---- */
+  .main {
+    flex: 1;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 2rem 4rem 4rem 3rem;
+    scrollbar-width: none;
+  }
+  .main::-webkit-scrollbar { display: none; }
+
+  /* ---- PAGE SECTIONS ---- */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page h1 {
+    font-family: var(--lora);
+    font-weight: 400;
+    font-size: 3.2rem;
+    line-height: 1.1;
+    margin-bottom: 1.4rem;
+    letter-spacing: -0.01em;
+  }
+  .page .sub {
+    font-family: var(--lora);
+    font-weight: 400;
+    font-size: 1.1rem;
+    opacity: 1;
+    margin-bottom: 2.5rem;
+  }
+  .page h2 {
+    font-family: var(--lora);
+    font-weight: 400;
+    font-size: 1.15rem;
+    margin-top: 2.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+  .page h3 {
+    font-family: var(--lora);
+    font-weight: 300;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.3rem;
+    margin-top: 1rem;
+  }
+  .page p {
+    font-family: var(--athiti);
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    max-width: 900px;
+  }
+  .page ul, .page ol {
+    margin-bottom: 1rem;
+    padding-left: 1.2rem;
+    max-width: 800px;
+  }
+  .page li {
+    font-family: var(--athiti);
+    font-weight: 300;
+    font-size: 0.9rem;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .page em {
+    font-family: var(--athiti);
+    font-style: italic;
+    font-weight: 100;
+  }
+
+  /* case studies */
+  .cs {
+    margin: 1.2rem 0 1.2rem 1rem;
+  }
+  .cs .n {
+    font-family: var(--athiti);
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 1;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .cs .n img.cs-icon {
+    height: 1rem;
+    margin-right: 0.5rem;
+    width: auto;
+    object-fit: contain;
+  }
+  .cs p {
+    font-family: var(--athiti);
+    font-style: italic;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    opacity: 1;
+  }
+  .cs .o {
+    font-family: var(--athiti);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.75rem;
+    opacity: 1;
+    margin-top: 0.3rem;
+  }
+
+  /* pullquote */
+  .pq {
+    font-family: var(--lora);
+    font-size: 1.25rem;
+    line-height: 1.4;
+    max-width: 580px;
+    opacity: 1;
+  }
+
+  /* reading list */
+  .rl {
+    margin-top: 2.5rem;
+  }
+  .rl .rl-t {
+    font-family: var(--athiti);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 1;
+    margin-bottom: 0.5rem;
+  }
+  .rl a {
+    display: block;
+    font-family: var(--athiti);
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: #000;
+    text-decoration: none;
+    opacity: 1;
+    padding: 0.2rem 0;
+    transition: opacity 0.15s;
+  }
+  .rl a:hover { opacity: 0.5; }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .shell { flex-direction: column; }
+    .sidebar {
+      width: 100%; min-width: unset; height: auto;
+      flex-direction: row; align-items: center; gap: 1.5rem;
+      padding: 1.5rem;
+    }
+    .sidebar .logo { margin-bottom: 0; }
+    .sidebar nav { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1rem; }
+    .sidebar nav a { text-align: left; font-size: 0.8rem; }
+    .main { padding: 1.5rem; }
+    .page h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo" onclick="show('index')"><img src="The%20Bridge.png" alt="The Bridge" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-family:Lora,Georgia,serif;font-weight:700;font-size:1.2rem>The Bridge</span>'"></div>
+    <nav>
+      <a onclick="show('idea')" id="nav-idea">1. How to find your idea</a>
+      <a onclick="show('market')" id="nav-market">2. How to pick the right market</a>
+      <a onclick="show('customer')" id="nav-customer">3. Your customer is your boss</a>
+      <a onclick="show('discovery')" id="nav-discovery">4. Customer discovery</a>
+      <a onclick="show('outreach')" id="nav-outreach">5. Effective outreach</a>
+      <a onclick="show('intro')" id="nav-intro">6. How to introduce yourself</a>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- INDEX -->
+    <div class="page active" id="page-index">
+      <h1>Index</h1>
+      <p>These six documents are the condensed thinking behind idea generation, market selection, customer types, discovery, outreach, and how to introduce yourself. They are written for founders of The Bridge, and designed to give everyone in the cohort a baseline understanding of the key topics covered in the program.</p>
+      <p>Each document is a standalone reference. Read them in order or jump to what you need. Use them before talks, during customer discovery, and when you need to pressure-test your thinking.</p>
+    </div>
+
+    <!-- 1. IDEA -->
+    <div class="page" id="page-idea">
+      <h1>How to find your idea</h1>
+
+      <p>When you're looking for your startup idea, start from what you uniquely know, have seen, or can build. You're not here to build any company. You want to build the company you are most likely to win with, and you're most likely to enjoy building.</p>
+      <p>Your idea is a starting point, not a destination. You will test it, break it, reshape it, and eventually arrive at something you could never have planned from day one. Ideation is not finished until you reach PMF. Everything before that is iteration.</p>
+
+      <h2>> Understand your edge</h2>
+      <p>Most founders approach startups with a goal-first mindset: decide the best idea, then figure out how to build it. Under real uncertainty, the winning pattern is usually the opposite: start from the means you actually have, and discover what outcomes become possible.</p>
+      <p>Your edge is your unfair advantage. It's built on who you are (skills, taste, obsessions), what you know (domains, insights, experiences), and who you know (network, access). Describe the key few things you can do that most founders cannot. Be specific.</p>
+      <ul>
+        <li><em>"I designed the guardrail architecture that let a healthcare company deploy LLMs into clinical note summarization"</em></li>
+        <li><em>"I built the perception-to-control stack that let warehouse robots grasp thousands of SKU variants"</em></li>
+        <li><em>"I can get 20 procurement-grade conversations in fintech risk within a week"</em></li>
+      </ul>
+
+      <h2>> Prompts to help you find ideas</h2>
+
+      <h3>Find a belief about the future, and build towards it</h3>
+      <p>Based on what you uniquely know and can build, what do you believe could be fundamentally different in 5-10 years? Name both the belief and the mechanism that will lead to this change. The mechanism is the only way to add credibility.</p>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/canva.png" alt="">Canva</div>
+        <p class="o">Founded 2012. $4Bn ARR, 265M users, $42Bn+ valuation.</p>
+        <p>Melanie Perkins was 19, teaching classmates Photoshop. She watched them spend an entire semester just learning where the buttons were. Her core belief: visual communication would overtake text as the primary language of the internet. The enabling forces: HTML5 making rich in-browser editing viable, social media exploding, mobile making images dominant. The first 100+ investors passed.</p>
+      </div>
+
+      <h3>"This is hard, it shouldn't be this hard"</h3>
+      <p>Notice a process you know well that is absurdly slow, expensive, or complex. Figure out why. This works best if the pain happens inside a domain where you have an edge, maps to a real budget or risk, and hides structural change that makes rebuilding newly possible.</p>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/Figma.png" alt="">Figma</div>
+        <p class="o">Founded 2011. $1Bn+ ARR, 13M users, IPO at ~$20Bn.</p>
+        <p>In 2012, design was single-player and offline. Designers used Sketch or Adobe, exported PNGs, emailed them around, collected comments in separate tools. Dylan Field realized browser technology had matured to the point where you could build serious graphics applications entirely in the browser.</p>
+        
+      </div>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/sporebio.png" alt="">Spore Bio</div>
+        <p class="o">Founded 2023 out of EF. Raised over 30M euros including a 22M Series A.</p>
+        <p>Amine Raji spent six years at Nestle watching every step of food production get hyper-optimized, except one: checking for bacterial contamination still relied on growing cultures in Petri dishes. Five-day wait. He met Maxime Mistretta from the Pasteur Institute. They built a system that uses spectral analysis and deep learning to identify contamination in under ten minutes.</p>
+      </div>
+
+      <h3>Ride the wave, but look for what's missing</h3>
+      <p>Major tech shifts create new categories. Start with a platform shift, describe who gains new power and what new behavior becomes normal. List the second-order problems. Pick one missing layer that, if solved, becomes a control point.</p>
+      <p>The companies that win don't just use a new technology. They identify a structural gap that the technology created, and they become the answer to that gap.</p>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/cursor.png" alt="">Cursor</div>
+        <p class="o">Founded 2022. $2Bn+ revenue, 1M+ DAUs, $30Bn+ valuation.</p>
+        <p>By 2022, LLMs could generate and reason about code. Copilot proved the behavior was real. But it was a plugin bolted on top of existing editors. It couldn't understand an entire codebase or coordinate changes across files. Four MIT students forked VS Code and rebuilt it as an AI-native editor.</p>
+      
+      </div>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/datadog.svg" alt="">Datadog</div>
+        <p class="o">Founded 2010. $3.5Bn+ revenue, $42Bn market cap.</p>
+        <p>In 2010, cloud computing was moving from experiment to production. All existing monitoring tools were built for permanent, physical servers. In the cloud, servers appear and disappear constantly. Olivier Pomel and Alexis Le-Quoc built the monitoring system that only made sense in a cloud world.</p>
+    
+      </div>
+
+      <h3>Unbundle and rebundle</h3>
+      <p>Unbundling: take a specific piece of a large product and do it 10x better. Rebundling is more powerful: look at a fragmented system and say this should not be ten steps, ten tools, and ten people. The winner redefines where the workflow lives.</p>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/rippling.png" alt="">Rippling</div>
+        <p class="o">Founded 2012. $1Bn+ revenue, $10Bn+ valuation.</p>
+        <p>Parker Conrad's insight was architectural: the real product wasn't any single module but the unified employee data layer underneath all of them. If you built a single system of record for every employee, every module on top could share data and eliminate fragmentation.</p>
+        
+      </div>
+
+      <h3>Think about which tools could use a network</h3>
+      <p>Look for tools people already use alone, and ask whether the output would become dramatically more valuable if shared. Can you build a version where sharing happens by default, so every new user makes the product better for everyone else?</p>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/pinterest.png" alt="">Pinterest</div>
+        <p class="o">Founded 2010. 100M+ monthly active users, $2.7Bn+ valuation.</p>
+        <p>Ben Silbermann built a personal bookmarking tool where boards were public by default. When you pinned something, it appeared in feeds. When someone repinned, it spread further. A compounding loop from day one.</p>
+      </div>
+
+      <h2>> What comes after finding the idea?</h2>
+      <p>Your idea is a starting point. What is the smallest thing you can do to validate potential? What is the riskiest assumption? Don't test the easy things. Test the thing that scares you. The winning idea often comes not from the first hunch, but from insights uncovered while testing a hunch that turns out to be wrong.</p>
+
+      <div class="cs">
+        <div class="n"><img class="cs-icon" src="startup_icons/huggingface.png" alt="">Hugging Face</div>
+        <p>Started as a chatbot for teenagers. Two years in, Google released BERT but it was inaccessible to most developers. The team produced a clean, usable PyTorch implementation within a week and open-sourced it. The reaction clarified the real direction: they became the hub where developers share models, datasets, and applications.</p>
+      </div>
+
+      <div class="rl">
+        <div class="rl-t">Recommended reading</div>
+        <a href="https://medium.com/entrepreneurs-first/ideas-pt-i-where-do-ideas-come-from-58ae761800a">Alice Bentinck, "Ideas Pt I: Where do ideas come from?"</a>
+        <a href="https://medium.com/entrepreneurs-first/ideas-pt-ii-finding-your-edge-8808121b591b">Alice Bentinck, "Ideas Pt II: Finding your Edge"</a>
+        <a href="https://sequoiacap.com/article/pmf-framework/">Team Sequoia, "The Arc Product-Market Fit Framework"</a>
+        <a href="https://blog.samaltman.com/idea-generation">Sam Altman, "Idea Generation"</a>
+        <a href="https://www.paulgraham.com/schlep.html">Paul Graham, "Schlep Blindness"</a>
+      </div>
+    </div>
+
+    <!-- 2. MARKET -->
+    <div class="page" id="page-market">
+      <h1>How to pick the right market</h1>
+
+      <p class="pq">"The market matters more than anything else. You cannot out-execute a market that doesn't exist. Markets are a force in startups in the same way gravity is a force in physics. Get the market right or don't build."</p>
+
+      <p>Teams that understand and win a large, urgent market can achieve PMF almost by accident. Teams in unready or tiny markets end up fighting for every customer. A Tier 1 VC will never invest if they don't think you're building in a market that can create at least a decacorn company.</p>
+
+      <h2>Market pull: is this mission-critical?</h2>
+      <p>Market pull is observable spending behavior already being paid to make a critical problem go away. Can you name the current budget line item you are replacing, and who signs for it? If you cannot point to credible spend, you are likely pushing. Today, pull is easy to fake because everyone wants to run AI experiments. Distinguish pilot pull from production pull.</p>
+
+      <h2>Market trajectory: where is it going?</h2>
+      <p>A great market doesn't have to be huge today. It has to become huge and inevitable tomorrow. Treat TAM as a trajectory and a category destiny. Write down the 2-3 forces that make the market expand regardless of you: cost curves collapsing, behavior shifts, regulation opening.</p>
+
+      <h2>Market structure and profit potential</h2>
+      <p>Some enormous markets are structurally awful. The question: if a company wins, does the market structurally want the winner to become the default layer everyone builds around? Ask: if we win, what do we become the default for? Check whether the market structurally wants coordination: network effects, standard-setting, workflow centralization.</p>
+
+      <h2>Distribution asymmetry</h2>
+      <p>Some markets contain an unfair distribution dynamic baked in. The route to growth compounds, cheapens, or self-reinforces instead of remaining brute-force forever. Stripe distributed through developers. Figma spread through individual designers. Cursor proved value directly in use. Check whether usage naturally propagates inside a team, company, or network.</p>
+
+      <h2>Speed of iteration</h2>
+      <p>Short feedback loops and low friction mean faster truth. Can you see conversion? Retention? Expansion? If the market's feedback is noisy, your learning compounding breaks.</p>
+
+      <h2>Market depth</h2>
+      <p>Your wedge sits inside a larger system where expansion is natural. What do you get to own that makes the next product inevitable?</p>
+
+      <h2>Non-consensus thesis</h2>
+      <p>The strongest markets usually look wrong at first. The right question isn't "is this crowded?" It's: what do we believe that most smart people currently disbelieve, and what mechanism makes our belief become true?</p>
+
+      <h2>Why now</h2>
+      <p>Great startups are often bad ideas that became good ideas because a constraint broke. Ask: "Would this have plausibly failed 2 years ago?" If the answer is no, your why-now is weak and you're probably late.</p>
+
+      <h2>Examples of great markets</h2>
+
+      <div class="cs">
+        <div class="n">Stripe</div>
+        <p>Built the financial OS for internet-native businesses. Attached to the growth of internet GDP. Distributed through developers who could adopt without permission. Two young founders with no network competing against PayPal.</p>
+      </div>
+
+      <div class="cs">
+        <div class="n">Scale AI</div>
+        <p>Sits on the critical path of AI: high-quality data and evaluation. Demand grows as a function of model capability, not just adoption. Once embedded in the training loop, switching costs become huge.</p>
+      </div>
+
+      <div class="cs">
+        <div class="n">Cursor</div>
+        <p>The editor is the fundamental control point. If the winning product becomes the default place where engineers read, write, refactor, and delegate work to agents, value concentrates around that layer.</p>
+      </div>
+
+      <div class="rl">
+        <div class="rl-t">Recommended reading</div>
+        <a href="https://pmarchive.com/guide_to_startups_part4.html">Marc Andreessen, "The Only Thing That Matters"</a>
+        <a href="https://blog.eladgil.com/p/how-can-you-tell-if-your-market-is-good">Elad Gil, "How Can You Tell if Your Market Is Good?"</a>
+        <a href="https://sequoiacap.com/article/pmf-framework/">Sequoia, "The Arc Product-Market-Fit Framework"</a>
+        <a href="https://paulgraham.com/ds.html">Paul Graham, "Do Things That Don't Scale"</a>
+      </div>
+    </div>
+
+    <!-- 3. CUSTOMER -->
+    <div class="page" id="page-customer">
+      <h1>Your customer is your boss</h1>
+
+      <p>The type of customer you sell to shapes your entire company: what you build, how you sell, who you hire, how fast you learn, how much capital you need, and how happy you'll be. Most founders think about this too late.</p>
+
+      <h2>Enterprise</h2>
+      <p>Large organizations, 1,000+ employees, $1B+ revenue. ACVs of $100K-$1M+. Sales cycles run 3-18 months with multiple stakeholders. If any one says no, the deal stalls. GTM is relationship-driven and top-down. Land and expand works because it reduces buyer risk. Net dollar retention is the metric that matters most; best-in-class run NDR above 130%. Expect 25-40% of headcount in sales, CS, and solutions engineering.</p>
+
+      <h2>SMB</h2>
+      <p>Companies with fewer than 500 employees. Contracts are small ($1K-$25K/year) but there are millions of them. Sales cycles are days to weeks. The owner evaluates, decides, and pays, sometimes in the same call. GTM is high-velocity and product-led. The challenge is churn: 30-50% annually is common and often structural. Your acquisition engine has to run constantly just to replace lost customers before you start growing.</p>
+
+      <h2>Prosumer</h2>
+      <p>Individual professionals who adopt a product before the company formally procures it. The most powerful GTM motion of the last decade. Nobody asks permission to use Cursor. A developer installs it, feels the speed difference, never goes back. Weeks later, the manager standardizes. 70% of Figma's enterprise deals originated from individual users on free plans.</p>
+      <p>PLG has a hard requirement: the product must be immediately useful to a single user without any network. Cursor had less than 30 people when it hit $100M revenue. The leverage comes from the product, not the salesforce.</p>
+
+      <h2>Consumer</h2>
+      <p>Highest-risk, highest-reward. You compete for the scarcest resource in the world: human attention. Switching cost is zero and competition is infinite. D1 and D7 retention are the only metrics that matter early. DAU/MAU at scale. Consumer is where taste matters most, and where the failure rate is extremely high.</p>
+
+      <h2>Which is right for you?</h2>
+      <p>If you're a young founder with no enterprise network, prosumer/PLG or SMB will give you faster feedback, revenue, and learning. You can move upmarket later. If you're going consumer, be honest: outcomes are binary, and you're competing against everything else a person could be doing.</p>
+
+      <div class="rl">
+        <div class="rl-t">Recommended reading</div>
+        <a href="https://medium.com/craft-ventures/enterprises-vs-smbs-whos-the-better-customer-for-b2b-saas-startups-9a0d4efe69e9">Craft Ventures, "Enterprises vs SMBs"</a>
+        <a href="https://www.lennysnewsletter.com/p/what-is-good-retention-issue-29">Lenny Rachitsky, "What is good retention"</a>
+        <a href="https://a16z.com/16-startup-metrics/">a16z, "16 Startup Metrics"</a>
+      </div>
+    </div>
+
+    <!-- 4. DISCOVERY -->
+    <div class="page" id="page-discovery">
+      <h1>How to do effective customer discovery</h1>
+
+      <p>Customer discovery means talking to the people you think you're building for. It sounds simple but it isn't. Humans are polite and confusing, founders are biased, and there is a lot of noise. You need a system.</p>
+
+      <h2>Validate 5 things, in order</h2>
+
+      <h3>1. ICP</h3>
+      <p>"Small businesses" or "developers" is not an ICP. You need at least three specific, measurable attributes. Gusto started with six: companies with five or fewer employees, in California, offering no benefits, only salaried employees, no contractors, willing to wait eight days after running payroll. Talk to 20-40+ people. Look for who leans in.</p>
+
+      <h3>2. Problem</h3>
+      <p>Understand exactly what they're struggling with, in their words, in their workflow. How much is it costing them? Go deep on impact and daily reality.</p>
+
+      <h3>3. Promise</h3>
+      <p>"You currently spend 5 days waiting for bacterial test results. With us, you get results in 10 minutes." Good promises are quantified. Test it in conversations before building. If nobody says "when can I have this?" you have a promise problem, not a product problem.</p>
+
+      <h3>4. Price</h3>
+      <p>Testing willingness to pay separates real demand from polite curiosity. Use commitment tests. Throw out a deliberately high number. They'll tell you their ceiling.</p>
+
+      <h3>5. Product</h3>
+      <p>Only once you've validated 1-4. Don't invest substantial time or money before you're confident on the first four.</p>
+
+      <h2>Extract behavior, not opinions</h2>
+      <p>If you're getting compliments, you're doing it wrong. What counts as data is behavior: concrete things people have actually done. Talk about their life, not your idea. Ask about the past, not the future.</p>
+
+      <h3>Five questions you can always ask</h3>
+      <ol>
+        <li><strong>"What is the hardest part about doing X?"</strong> Gets to the core pain.</li>
+        <li><strong>"Tell me about the last time you encountered that problem."</strong> Forces a specific story.</li>
+        <li><strong>"Why was that hard?"</strong> Gives you your marketing copy. Pay attention to exact words.</li>
+        <li><strong>"What have you done to try to solve it?"</strong> Reveals actual competitors and qualifies seriousness.</li>
+        <li><strong>"What don't you love about those solutions?"</strong> Grounded in real experience.</li>
+      </ol>
+
+      <h2>How to know if customers are serious</h2>
+      <p>Commitment is measured by what someone gives up, not what they say. Money is much better than time. Ask the question you're terrified to ask. Bad signals: "Send me the link when it's ready." Good signals: paid pilot, introductions, shared proprietary data, unprompted pricing questions, describing their implementation plan before you finish the demo.</p>
+
+      <div class="rl">
+        <div class="rl-t">Recommended reading</div>
+        <a href="https://www.momtestbook.com/">Rob Fitzpatrick, "The Mom Test"</a>
+        <a href="https://www.youtube.com/watch?v=z1iF1c8w5Lg">YC, "How To Talk To Users"</a>
+        <a href="https://review.firstround.com/how-to-know-if-your-ideas-the-right-one-a-founders-guide-for-successful-early-stage-customer-discovery/">First Round, "Successful Early-Stage Customer Discovery"</a>
+        <a href="https://www.lennysnewsletter.com/p/how-to-identify-your-ideal-customer">Lenny Rachitsky, "How to identify your ICP"</a>
+      </div>
+    </div>
+
+    <!-- 5. OUTREACH -->
+    <div class="page" id="page-outreach">
+      <h1>How to do effective outreach</h1>
+
+      <p>Outreach is a pipeline you build to repeatedly reach the right people, run good conversations, and convert the best ones as customers.</p>
+
+      <h2>Mental models</h2>
+      <p>High-quality early outreach is manual, long, and painful. Under no circumstances should you outsource or automate this in early stages. Think of outreach as a measurement system for "do people care enough about my problem?" Build the funnel backwards: start from "I need 3 pilots in month 1" and work backward through conversion rates.</p>
+
+      <h2>Step 1: Start warm</h2>
+      <p>First conversations come from people you already know. Former colleagues, classmates, alumni, fellow founders. When asking for intros: identify the specific person, write a self-contained forwardable email readable in under 45 seconds, respond immediately when connected, close the loop with the introducer. At the end of every conversation: "Is there anyone else you think I should talk to?"</p>
+
+      <h2>Step 2: Cold outreach</h2>
+      <p>Keep it very short. Five to seven sentences, readable on a phone without scrolling. Single specific ask. Write like a human. Establish credibility in one line. Make it about them. Follow up 2-3 times. LinkedIn: connection requests with no message have higher acceptance rates. Volume limits: 20-30/day max.</p>
+
+      <h2>Step 3: Go where your customers live</h2>
+      <p>In-person events convert dramatically higher than any digital channel. Trade shows, conferences, meetups. Tracy Young went to construction sites with doughnuts. Scale AI went to CVPR with laptops, pitching booth to booth without a booth. Online: Reddit, HN, Slack groups, Discord channels, industry forums. Participate genuinely first.</p>
+
+      <h2>How much is enough?</h2>
+      <p>Most founders dramatically underestimate volume. A typical funnel: 800 emails, 400 opened, 40 responses, 10 demos, 1 customer. Block 3-4 hours per day for outreach only. Start manual. Never automate before you've validated the message by hand.</p>
+
+      <h2>Founder stories</h2>
+      <div class="cs">
+        <div class="n">Stripe</div>
+        <p>Patrick Collison would say "give me your laptop" and set up integration on the spot. By the end of the conversation, the founder was a customer.</p>
+      </div>
+      <div class="cs">
+        <div class="n">Pinterest</div>
+        <p>Ben Silbermann changed all the Apple Store display computers to show Pinterest, then stood in the back and watched people react.</p>
+      </div>
+      <div class="cs">
+        <div class="n">Snyk</div>
+        <p>Ran vulnerability checks on prospects before reaching out: "I found 5 unprotected endpoints on your public API. Here's the list."</p>
+      </div>
+    </div>
+
+    <!-- 6. INTRO -->
+    <div class="page" id="page-intro">
+      <h1>How to introduce yourself</h1>
+
+      <p>Your introduction is the most important two minutes of your early founder life, and most people waste it. You will give this intro hundreds of times: to potential cofounders, customers, investors, and people you want to hire.</p>
+
+      <h2>The European intro vs the US intro</h2>
+
+      <p class="pq">"Hello, my name is Charlie Songhurst. After reading PPE at Oxford, I started at McKinsey in London. Afterwards, I joined Microsoft where I headed Strategy. I moved to San Francisco where I angel invest."</p>
+
+      <p>Polite, accurate, and completely forgettable. Now the US version:</p>
+
+      <p class="pq">"Hi, I'm Charlie. After Oxford, I got my first job at McKinsey earning $200K a year. Two years later, Microsoft offered me GM London at $2M yearly. I started investing in crypto, turned a few hundred Ks into my first billion. Today I'm one of the most prolific angel investors in SF. I sit on the Board of Meta. I've seen it all."</p>
+
+      <p>Numbers, specifics, outcomes. Almost no adjectives. No "I was fortunate to." Just facts and data.</p>
+
+      <h2>Tips</h2>
+      <p><strong>Lead with the strongest thing, not the first thing.</strong> If the most impressive fact about you is that you built a product used by 2 million people, say that first. You earn each additional second of attention. If you bury your best material at the end, they've already tuned out.</p>
+      <p><strong>Use accomplishments rather than titles.</strong> "I was a PM at Stripe" tells someone where you sat. "I built the billing infrastructure that processes $50B+ in recurring revenue for Stripe's SaaS customers" tells them what you can do. Titles are forgettable. Specific things you built, shipped, or achieved are not.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const nav = document.getElementById('nav-' + id);
+  if (nav) nav.classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+}
+</script>
+
+</body>
+</html>
