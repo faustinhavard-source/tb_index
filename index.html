@@ -1,550 +1,1045 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Bridge</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Athiti:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --lora: 'Lora', Georgia, serif;
-    --athiti: 'Athiti', sans-serif;
-  }
-
-  html { font-size: 16px; }
-  body { background: #fff; color: #000; overflow: hidden; height: 100vh; }
-  ::selection { background: #000; color: #fff; }
-
-  /* ---- LAYOUT ---- */
-  .shell {
-    display: flex;
-    height: 100vh;
-  }
-
-  /* ---- SIDEBAR ---- */
-  .sidebar {
-    width: 350px;
-    min-width: 320px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    padding: 3rem 2.5rem 2rem 1rem;
-    overflow-y: auto;
-  }
-  .sidebar .logo {
-    cursor: pointer;
-    margin-bottom: 2rem;
-  }
-  .sidebar .logo img {
-    height: 2rem;
-    width: auto;
-    display: block;
-    image-rendering: -webkit-optimize-contrast;
-  }
-  .sidebar nav {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.3rem;
-  }
-  .sidebar nav a {
-    font-family: var(--athiti);
-    font-weight: 10;
-    font-size: 1rem;
-    color: #000;
-    text-decoration: none;
-    opacity: 1;
-    letter-spacing: -0.01em;
-    transition: opacity 0.2s;
-    text-align: right;
-    cursor: pointer;
-    line-height: 1.2;
-}
-  .sidebar nav a:hover { opacity: 0.5; }
-  .sidebar nav a.active { opacity: 1; }
-
-  /* ---- MAIN CONTENT ---- */
-  .main {
-    flex: 1;
-    height: 100vh;
-    overflow-y: auto;
-    padding: 2rem 4rem 4rem 3rem;
-    scrollbar-width: none;
-  }
-  .main::-webkit-scrollbar { display: none; }
-
-  /* ---- PAGE SECTIONS ---- */
-  .page { display: none; }
-  .page.active { display: block; }
-
-  .page h1 {
-    font-family: var(--lora);
-    font-weight: 400;
-    font-size: 3.2rem;
-    line-height: 1.1;
-    margin-bottom: 1.4rem;
-    letter-spacing: -0.01em;
-  }
-  .page .sub {
-    font-family: var(--lora);
-    font-weight: 400;
-    font-size: 1.1rem;
-    opacity: 1;
-    margin-bottom: 2.5rem;
-  }
-  .page h2 {
-    font-family: var(--lora);
-    font-weight: 400;
-    font-size: 1.15rem;
-    margin-top: 2.5rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-  }
-  .page h3 {
-    font-family: var(--lora);
-    font-weight: 300;
-    font-size: 1rem;
-    letter-spacing: 0.02em;
-    margin-bottom: 0.3rem;
-    margin-top: 1rem;
-  }
-  .page p {
-    font-family: var(--athiti);
-    font-weight: 300;
-    font-size: 1rem;
-    line-height: 1.5;
-    margin-bottom: 1rem;
-    max-width: 900px;
-  }
-  .page ul, .page ol {
-    margin-bottom: 1rem;
-    padding-left: 1.2rem;
-    max-width: 800px;
-  }
-  .page li {
-    font-family: var(--athiti);
-    font-weight: 300;
-    font-size: 0.9rem;
-    line-height: 1;
-    margin-bottom: 0.3rem;
-  }
-  .page em {
-    font-family: var(--athiti);
-    font-style: italic;
-    font-weight: 100;
-  }
-
-  /* case studies */
-  .cs {
-    margin: 1.2rem 0 1.2rem 1rem;
-  }
-  .cs .n {
-    font-family: var(--athiti);
-    font-weight: 600;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    opacity: 1;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .cs .n img.cs-icon {
-    height: 1rem;
-    margin-right: 0.5rem;
-    width: auto;
-    object-fit: contain;
-  }
-  .cs p {
-    font-family: var(--athiti);
-    font-style: italic;
-    font-size: 0.85rem;
-    line-height: 1.7;
-    opacity: 1;
-  }
-  .cs .o {
-    font-family: var(--athiti);
-    font-style: normal;
-    font-weight: 500;
-    font-size: 0.75rem;
-    opacity: 1;
-    margin-top: 0.3rem;
-  }
-
-  /* pullquote */
-  .pq {
-    font-family: var(--lora);
-    font-size: 1.25rem;
-    line-height: 1.4;
-    max-width: 580px;
-    opacity: 1;
-  }
-
-  /* reading list */
-  .rl {
-    margin-top: 2.5rem;
-  }
-  .rl .rl-t {
-    font-family: var(--athiti);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    opacity: 1;
-    margin-bottom: 0.5rem;
-  }
-  .rl a {
-    display: block;
-    font-family: var(--athiti);
-    font-size: 0.8rem;
-    font-weight: 300;
-    color: #000;
-    text-decoration: none;
-    opacity: 1;
-    padding: 0.2rem 0;
-    transition: opacity 0.15s;
-  }
-  .rl a:hover { opacity: 0.5; }
-
-  /* ---- RESPONSIVE ---- */
-  @media (max-width: 768px) {
-    .shell { flex-direction: column; }
-    .sidebar {
-      width: 100%; min-width: unset; height: auto;
-      flex-direction: row; align-items: center; gap: 1.5rem;
-      padding: 1.5rem;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Bridge - Founder Documents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Athiti:wght@100;300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --lora: 'Lora', Georgia, serif; --athiti: 'Athiti', sans-serif; }
+    html { font-size: 16px; }
+    body { background: #fff; color: #000; overflow: hidden; height: 100vh; }
+    ::selection { background: #000; color: #fff; }
+    .shell { display: flex; height: 100vh; }
+    .sidebar { width: 350px; min-width: 320px; height: 100vh; display: flex; flex-direction: column; align-items: flex-end; padding: 3rem 2.5rem 2rem 1rem; overflow-y: auto; }
+    .sidebar .logo { cursor: pointer; margin-bottom: 2rem; }
+    .sidebar .logo img { height: 2rem; width: auto; display: block; image-rendering: -webkit-optimize-contrast; }
+    .sidebar nav { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; }
+    .sidebar nav a { font-family: var(--athiti); font-weight: 10; font-size: 1rem; color: #000; text-decoration: none; opacity: 1; letter-spacing: -0.01em; transition: opacity 0.2s; text-align: right; cursor: pointer; line-height: 1.2; }
+    .sidebar nav a:hover { opacity: 0.5; }
+    .sidebar nav a.active { opacity: 1; }
+    .main { flex: 1; height: 100vh; overflow-y: auto; padding: 2rem 4rem 4rem 3rem; scrollbar-width: none; }
+    .main::-webkit-scrollbar { display: none; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page h1 { font-family: var(--lora); font-weight: 400; font-size: 3.2rem; line-height: 1.1; margin-bottom: 1.4rem; letter-spacing: -0.01em; }
+    .page .sub { font-family: var(--lora); font-weight: 400; font-size: 1.1rem; opacity: 1; margin-bottom: 2.5rem; }
+    .page h2 { font-family: var(--lora); font-weight: 400; font-size: 1.15rem; margin-top: 2.5rem; margin-bottom: 0.5rem; line-height: 1.3; }
+    .page h3 { font-family: var(--lora); font-weight: 300; font-size: 1rem; letter-spacing: 0.02em; margin-bottom: 0.3rem; margin-top: 1rem; }
+    .page p { font-family: var(--athiti); font-weight: 300; font-size: 1rem; line-height: 1.5; margin-bottom: 1rem; max-width: 900px; }
+    .page ul, .page ol { margin-bottom: 1rem; padding-left: 1.2rem; max-width: 800px; }
+    .page li { font-family: var(--athiti); font-weight: 300; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.3rem; }
+    .page em { font-family: var(--athiti); font-style: italic; font-weight: 100; }
+    .cs { margin: 1.2rem 0 1.2rem 1rem; }
+    .cs .n { font-family: var(--athiti); font-weight: 600; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 1; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+    .cs .n img.cs-icon { height: 1rem; margin-right: 0.5rem; width: auto; object-fit: contain; }
+    .cs p { font-family: var(--athiti); font-style: italic; font-size: 0.85rem; line-height: 1.7; opacity: 1; }
+    .cs .o { font-family: var(--athiti); font-style: normal; font-weight: 500; font-size: 0.75rem; opacity: 1; margin-top: 0.3rem; }
+    .pq { font-family: var(--lora); font-size: 1.25rem; line-height: 1.4; max-width: 580px; opacity: 1; }
+    .rl { margin-top: 2.5rem; }
+    .rl .rl-t { font-family: var(--athiti); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; opacity: 1; margin-bottom: 0.5rem; }
+    .rl a { display: block; font-family: var(--athiti); font-size: 0.8rem; font-weight: 300; color: #000; text-decoration: none; opacity: 1; padding: 0.2rem 0; transition: opacity 0.15s; }
+    .rl a:hover { opacity: 0.5; }
+    @media (max-width: 768px) {
+      .shell { flex-direction: column; }
+      .sidebar { width: 100%; min-width: unset; height: auto; flex-direction: row; align-items: center; gap: 1.5rem; padding: 1.5rem; }
+      .sidebar .logo { margin-bottom: 0; }
+      .sidebar nav { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1rem; }
+      .sidebar nav a { text-align: left; font-size: 0.8rem; }
+      .main { padding: 1.5rem; }
+      .page h1 { font-size: 2rem; }
     }
-    .sidebar .logo { margin-bottom: 0; }
-    .sidebar nav { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1rem; }
-    .sidebar nav a { text-align: left; font-size: 0.8rem; }
-    .main { padding: 1.5rem; }
-    .page h1 { font-size: 2rem; }
-  }
-</style>
+  </style>
 </head>
 <body>
+  <div class="shell">
+    <div class="sidebar">
+      <div class="logo">
+        <img src="The Bridge.png" alt="The Bridge">
+      </div>
+      <nav>
+        <a onclick="show('idea')" id="nav-idea">1. How to find your idea</a>
+        <a onclick="show('market')" id="nav-market">2. How to pick the right market</a>
+        <a onclick="show('customer')" id="nav-customer">3. Your customer is your boss</a>
+        <a onclick="show('discovery')" id="nav-discovery">4. Customer discovery</a>
+        <a onclick="show('outreach')" id="nav-outreach">5. Effective outreach</a>
+        <a onclick="show('intro')" id="nav-intro">6. How to introduce yourself</a>
+        <a onclick="show('cofounding')" id="nav-cofounding">7. Building your co-founding team</a>
+      </nav>
+    </div>
+    <div class="main">
 
-<div class="shell">
+      <!-- INDEX PAGE -->
+      <div class="page active" id="page-index">
+        <h1>Index</h1>
+        <p>Written documents are the best way to deliver key information to everyone - so that we know that everyone in the cohort has a baseline understanding of key information. We should have one written version of each talk that has more detailed information. These written documents will be shared with the founders ahead of each talk, in the beginning of the program.</p>
+      </div>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="logo" onclick="show('index')"><img src="The%20Bridge.png" alt="The Bridge" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-family:Lora,Georgia,serif;font-weight:700;font-size:1.2rem>The Bridge</span>'"></div>
-    <nav>
-      <a onclick="show('idea')" id="nav-idea">1. How to find your idea</a>
-      <a onclick="show('market')" id="nav-market">2. How to pick the right market</a>
-      <a onclick="show('customer')" id="nav-customer">3. Your customer is your boss</a>
-      <a onclick="show('discovery')" id="nav-discovery">4. Customer discovery</a>
-      <a onclick="show('outreach')" id="nav-outreach">5. Effective outreach</a>
-      <a onclick="show('intro')" id="nav-intro">6. How to introduce yourself</a>
-    </nav>
+      <!-- PAGE 1: HOW TO FIND YOUR IDEA -->
+      <div class="page" id="page-idea">
+        <h1>How to find your idea</h1>
+
+        
+        <p>The purpose of this doc is to give you prompts that can help you find your startup idea. Before we start, there are two important things to know about this topic.</p>
+        
+        <ol>
+          <li>When you're looking for your startup idea, our advice is to start from what you uniquely know, have seen, or can build. You're not here to just build any company, you want to build the company you are most likely to win with, and you're most likely to actually enjoy building.</li>
+          <li>Another thing to understand about a startup idea, is that it is a starting point, not a destination. You will test it, break it, reshape it, and eventually arrive at something you could not never have planned from day one. Ideation is not finished until you reach PMF. Everything before that is iteration.</li>
+        </ol>
+
+        <h2>Understand what your edge is</h2>
+        <p>Most early founders approach startups with a goal-first mindset: they try to decide what the best idea is, and then figure out how to build it. But under real uncertainty, which is what founding is, the winning pattern is usually the opposite: start from the means that you actually have, and discover what outcomes become possible.</p>
+        <p>That's why a helpful starting point is what we call your edge, aka your unfair advantage in solving a problem compared to other founders. Your edge is built on:</p>
+        <ul>
+          <li>Who you are: your skills, taste, personality, obsessions</li>
+          <li>What you know: your domains, insights, experiences, the things you understand at a level that few others do</li>
+          <li>Who you know: your network, access, the people who will take your call</li>
+        </ul>
+        <p>To help you actually understand your edges, describe the key few things you can do that most founders cannot. Name specifics that differentiate you from the crowd and be careful not to be generic. Eg, a terrible example of an edge is: I worked at company X.</p>
+        <p>Here are some better examples:</p>
+        <ul>
+          <li>I designed the guardrail architecture that let a healthcare company deploy LLMs into clinical note summarization</li>
+          <li>I built the perception-to-control stack that let a warehouse robots grasp thousands of SKU variants</li>
+          <li>I spent my PhD and postdoc developing spectral identification methods for bacterial detection so I know exactly which wavelength signatures differentiate pathogenic strains</li>
+          <li>I can get 20 procurement-grade conversations in fintech risk within a week</li>
+          <li>I know exactly how this buyer really buys</li>
+          <li>I built the self-serve growth loop that took a design tool from 50K to 2M MAU in 12 months</li>
+        </ul>
+
+        <h2>Prompts to help you find ideas</h2>
+
+        <h3>Find a belief about the future, and build towards that</h3>
+        <p>Based on what you and your cofounder uniquely know and can build, what do you believe could be fundamentally different in 5-10 years? Make sure that you can name both the belief about what will be different in the future, but also what the cause / mechanism is that will lead to this change. Naming a mechanism is the only way to add credibility to your belief.</p>
+        <ul>
+          <li>What do technologies available now, or in the imminent future, allow us to build that will fundamentally disrupt a sector/category or create an entirely new category? How and why?</li>
+          <li>What are your most extreme, counter-intuitive or non-trivial beliefs in that area?</li>
+        </ul>
+        <p>Then, think about how your team's belief would be brought to reality. Specifically, come up with a hunch on how you might solve the problem for your customer, aka what product you might create to bring your belief to life.</p>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/canva.png" alt="">Canva</div>
+          <div class="o">Founded 2012. $4Bn ARR, 265 million users, $42Bn+ valuation.</div>
+          <p>Melanie Perkins was a 19-year-old university student in Perth, Australia, teaching classmates how to use Photoshop and InDesign. She watched them spend an entire semester just learning where the buttons were. Her mother, a teacher, had spent hundreds of hours wrestling with InDesign to create a single school publication. The software existed, but it was built for professional designers, not for the millions of people who needed to make something look decent and had no idea how. That gap between how hard design was and how easy it should be was Perkins' edge: not a technical edge, but a deep understanding of the non-designer's struggle with design tools.</p>
+          <p>Another edge: she had access to one specific use case where the problem was acute, high school yearbooks. Teachers with no design training were expected to produce beautiful publications, and their tools were either overwhelmingly complex or laughably primitive.</p>
+          <p>Perkins' core belief about the future was that visual communication would overtake text as the primary language of the internet. She saw that everyone, not just designers, would need to create and share visual content online. Although it may seem obvious today that image would become central to online communication, it wasn't in 2012. The prevailing mental model of the internet was still an online newspaper or magazine at best: text-heavy, link-driven, designed to be read. The idea that a drag-and-drop design tool for non-designers could become one of the most-used software products in the world would have sounded naive (and it did to the first 100+ investors that passed on Canva).</p>
+          <p>The enabling forces behind this belief were: browser technology was maturing (HTML5 was finally making rich in-browser editing viable), social media was exploding (Facebook, Instagram had hit 50 million in under two years, Pinterest was the fastest-growing site in history), and the shift to mobile meant every piece of content was now competing for attention on a small screen where images dominated and text walls didn't perform. This meant that small businesses and individuals who had never needed a designer before were suddenly expected to produce visual content daily: social posts, ads, headers, etc. Their options were either $600/year Adobe subscriptions or Microsoft Paint.</p>
+          <p>Canva was founded in 2012. Today, Canva has $4Bn ARR, 265 million users, and a valuation of over $42Bn.</p>
+        </div>
+
+        <h3>This is hard, it shouldn't be this hard</h3>
+        <p>Another prompt : notice a process that you know well, and that is absurdly slow, expensive, or complex. Try to figure out: why is this so hard?</p>
+        <p>When a process feels absurdly difficult, that often points to a structural misalignment: the tools, systems, or institutions that serve a need were built for a different era, a different technology stack, or a different set of user expectations.</p>
+        <p>Be very wary here, though. This framework is the one most prone to generate tarpit ideas. Many daily consumer problems are shared by everyone, which usually yields obvious, crowded ideas (and thin differentiation). This mainly works if we're talking about expert frustration on a specific process, not consumer annoyance. Eg, please avoid the classic: "why is it so hard to find that one document buried somewhere between Notion, Drive, and Slack".</p>
+        <p>This prompt works best if you can think of a pain that:</p>
+        <ul>
+          <li>happens inside a domain where you have an edge</li>
+          <li>maps to a real budget or real risk (money, time, compliance, revenue loss)</li>
+          <li>hides structural change (cost curve collapse, regulatory shift, distribution shift) that makes rebuilding the workflow newly possible. This is hard ideas often start as a product problem but become a system design problem (distribution, incentives, cost).</li>
+        </ul>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/Figma.png" alt="">Figma</div>
+          <div class="o">Founded 2011. $1Bn+ ARR, 13 million users, IPO at ~$20Bn.</div>
+          <p>In 2012, design was still a single-player, offline experience. Designers used Sketch (Mac-only) or Adobe's desktop tools, and when they wanted feedback, they exported PNGs, emailed them around, and collected comments in separate tools: a horrifying and manual process. Version control didn't exist. Every handoff between designer and engineer involved friction, duplication, and lost context. It shouldn't have been that hard.</p>
+          <p>Dylan Field had suffered through this during an internship at a company called Flipboard. When he was a CS student at Brown, his teaching assistant and friend Evan Wallace showed him a WebGL demo. Most people who saw this thought about the unlock for gaming. But Dylan saw something else : he realized that browser technology had quietly matured to the point where you could build serious, high-performance graphics applications entirely in the browser. That's what unlocked the idea for figma. Before this tech unlock, the horrifying and manual design process would have remained just as hard, despite tons of people suffering from it.</p>
+          <p>Figma was founded in 2011. Today, Figma has $1Bn+ ARR, 13 million users, and IPOed at valuation of approx $20Bn.</p>
+        </div>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/sporebio.png" alt="">Spore.Bio</div>
+          <div class="o">Founded 2023 out of EF. Raised over €30M including a €22M Series A.</div>
+          <p>Amine Raji, CEO of SporeBio, spent six years as a manufacturing engineer at Nestlé. There, he saw how every step of food production had been hyper-optimized: supply chains timed to the minute, lean manufacturing everywhere, every process calibrated for speed (and thus, profit). And then, in the middle of all this optimization, there was a five-day wall.</p>
+          <p>A critical step, which was checking whether a product was contaminated with bacteria, still relied on growing cultures in Petri dishes, a technique that hadn't fundamentally changed in over a century. You literally had to wait for bacteria to grow, which meant 5 days in food and beverage, and up to 14 days in cosmetics.</p>
+          <p>Amine left Nestlé, joined Entrepreneurs First in Paris, and met Maxime Mistretta, a PhD graduate and postdoc from the Pasteur Institute specializing in microbiology. Their combination was textbook Edge + Edge: Raji had the market edge (he knew the factory floor, the procurement process, the buyer), and Mistretta had the technical edge (he could build a completely different detection system).</p>
+          <p>Their approach sidesteps traditional molecular biology entirely: instead of growing bacteria and waiting, Spore.Bio fires light at specific wavelengths toward a sample and uses a pre-trained deep learning model to identify contamination from the spectral signature, in under ten minutes. Advances in deep learning and spectral analysis made it newly possible to identify bacterial contamination without culture-based methods, a capability that simply did not exist years earlier.</p>
+          <p>Spore.Bio was founded in 2023 out of Entrepreneurs First. They have raised over €30 million to date, including a €22 million Series A led by Singular in early 2025.</p>
+        </div>
+
+        <h3>Ride the wave, but look for what's missing</h3>
+        <p>Major technological shifts create entire new categories of companies, and that's often where the biggest companies in the world are created. The internet created Google, Facebook, and Amazon. Mobile created Uber, Instagram, and WhatsApp. Cloud infrastructure created Snowflake and Datadog. AI is creating the next wave right now.</p>
+        <p>Start with a platform shift statement you are excited about and willing to defend. Then:</p>
+        <ul>
+          <li>Describe who gains new power (developer, consumer, operator) and what new behavior becomes normal.</li>
+          <li>List the second-order problems that must be solved for the shift to fully realize (trust, coordination, workflow integration, compliance, cost control).</li>
+          <li>Pick one missing layer that, if solved, becomes a control point, aka the place workflow lives, the interface everyone uses, or the infrastructure everyone routes through.</li>
+        </ul>
+        <p>A word of caution: today, many founders are actually just building a wrapper. The framework doesn't work well if you are just using a new technology, aka "let's put an LLM in front of an existing workflow". The companies in the examples below didn't just use a new technology. They identified a structural gap that the technology created, and they became the answer to that gap.</p>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/cursor.png" alt="">Cursor</div>
+          <div class="o">Founded 2022. $2Bn+ revenue, 1M+ DAUs, $30Bn+ valuation.</div>
+          <p>By 2022, LLMs could generate, understand, and reason about code at a high level. A new behavior was becoming normal: developers interacting with AI as a collaborator, not just a linter. GitHub Copilot proved this was real: within a year of launch, it was generating roughly 40% of the code written by developers. But the second-order problems were everywhere. Copilot was built as an extension, a plugin bolted on top of existing editors. It could autocomplete lines, but it couldn't understand an entire codebase, couldn't coordinate changes across multiple files, and couldn't reason about the project as a whole. The architecture was wrong: the missing layer was not "better autocomplete," it was a development environment rebuilt from the ground up with AI at the core.</p>
+          <p>Four MIT computer science students, Michael Truell, Sualeh Asif, Arvid Lunnemark, and Aman Sanger, saw this gap. After a year of trying, ideating, an pivoting, they came up with the beginning of Cursor as we know it today. Originally, they spent nearly a year trying to build AI autocomplete for mechanical engineering CAD tools, before realizing they had terrible founder-market fit: they weren't mechanical engineers, didn't understand the workflows, and the training data wasn't there the way it was for code.</p>
+          <p>Moving back to standard software dev, they forked VS Code and rebuilt it as an AI-native editor. The decision to fork, rather than build another plugin, was the critical architectural bet: by owning the entire editor surface, they could embed AI into every layer, from code completion to multi-file editing to codebase-wide understanding.</p>
+          <p>Cursor was founded in 2022. It went from launch to $1 billion in ARR faster than any B2B software company in history. Today, Cursor has $2Bn+ revenue, 1M+ DAUs, and is valued at over $30Bn.</p>
+        </div>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/datadog.svg" alt="">Datadog</div>
+          <div class="o">Founded 2010. $3.5Bn+ revenue, $42Bn market cap.</div>
+          <p>In 2010, cloud computing was just beginning to move from experiment to production infrastructure. AWS had launched its core compute service only four years earlier. The platform shift was clear: companies were moving their entire infra to the cloud. Engineering teams were now spinning up and shutting down servers constantly, on demand, instead of managing fixed fixed, on-prem servers.</p>
+          <p>This shift created a massive second-order problem. All the existing monitoring tools had been built for a world of permanent, physical servers. In the cloud, servers appear and disappear constantly. You can't monitor what you can't see, and the environment was now changing faster than humans could track. That was the missing layer: the cloud had given companies a fundamentally new way to run infrastructure, but no one had built the visibility layer that this new infrastructure required to actually work.</p>
+          <p>Olivier Pomel and Alexis Lê-Quôc saw this gap. They started Datadog in New York in 2010, and for the first six months, spoke to engineering teams migrating to the cloud, to understand exactly what the pain looked like. They ended up building the monitoring system that only made sense in a cloud world, and by doing so, they became the infrastructure layer that every cloud-adopting company eventually routed through.</p>
+          <p>Datadog was founded in 2010. Today, Datadog has $3.5Bn+ revenue and a $42Bn market cap.</p>
+        </div>
+
+        <h3>Unbundle and rebundle</h3>
+        <p>Most markets are the result of years of accumulation: tools added on top of tools, workflows stitched together, people compensating for gaps with manual work. Over time, this creates either bloated bundles (one tool trying to do everything badly) or fragmented workflows (ten tools loosely connected, with constant friction between them).</p>
+        <p>Unbundling happens when a startup takes a specific piece of a large product and does it 10x better. These companies succeeded because they identified a specific function that was trapped inside a bloated bundle, and they liberated and 10x improved it.</p>
+        <p>Rebundling is more powerful, and less intuitive. It happens when a startup looks at a fragmented system and says: this should not be ten steps, ten tools, and ten people. It should be one system. The winner is the one that redefines where the workflow lives.</p>
+        <p>The reason unbundling or rebundling works is always structural. Something changed (the cost of building, distribution, etc). Without that structural change, even if existing systems may be inefficient, they will usually persist because the economics haven't shifted.</p>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/rippling.png" alt="">Rippling</div>
+          <div class="o">Founded 2017. Over 10,000 customers, $570M+ ARR, valued at $16.8Bn+.</div>
+          <p>When Parker Conrad started Rippling, the HR, IT, and finance software landscape was the textbook case of fragmentation. A company onboarding a new employee had to enter the same information into a payroll system, a benefits platform, an IT device management tool, an app provisioning system, an expense tracker, and half a dozen others. Each tool had its own login, its own data model, its own quirks. If an employee changed roles, went on leave, or left the company, someone had to manually update every system.</p>
+          <p>This fragmentation persisted because, for a decade, the startup playbook said to focus on one narrow thing. Every SaaS company followed the unbundling logic: take one slice of the workflow, build a solution, and do it extremely well. The result was a landscape of dozens of excellent, narrow tools that didn't talk to each other.</p>
+          <p>What made rebundling newly possible and necessary was that the SaaS era had overshot. The same wave that created all these solutions also created the problem: companies were now managing 100+ separate software tools, each holding a different slice of the same employee data. The cost of fragmentation was starting to become real compliance risk (especially as companies hired across countries and jurisdictions), security gaps when offboarding was delayed across systems, and a growing tax on every HR and IT team's time that got worse with every new tool added.</p>
+          <p>Conrad's founding insight was architectural: the real product wasn't any single module but the unified employee data layer underneath all of them. If you built a single system of record for every piece of information about every employee, then every module built on top of it could share data, automate handoffs, and eliminate the friction that fragmentation created.</p>
+          <p>Rippling was founded in 2017. Today, Rippling has over 10,000 customers, $570M+ ARR, and is valued at $16.8Bn+.</p>
+        </div>
+
+        <h3>Think about which tools could use a network</h3>
+        <p>Networks are some of the most valuable type of businesses, but they are almost impossible to start directly. A network with no users has no value, and therefore cannot attract users. This is the classic cold start problem, and it kills most network-dependent startups before they ever get off the ground.</p>
+        <p>A good way to find a network idea is to look for tools that people already use alone, and ask whether the output of that tool would become dramatically more valuable if it were shared. Look at the software you use, the workflows you see, the things people create, and ask:</p>
+        <ul>
+          <li>What tools do people use today where the output stays trapped on one person's computer or in one team's account?</li>
+          <li>What artifact does this tool naturally produce? (a file, a template, a board, a link, a dataset, a workflow)</li>
+          <li>What would change if that output were visible, shareable, or remixable by others? Does that artifact become substantially more valuable?</li>
+          <li>Is there a version of this tool you could build where sharing happens by default, not as an extra step, so that every new user automatically makes the product better for everyone else?</li>
+        </ul>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/pinterest.png" alt="">Pinterest</div>
+          <div class="o">Founded 2009. $4.5Bn+ revenue, 600M MAUs.</div>
+          <p>Ben Silbermann, the founder of Pinterest, built what was essentially a personal bookmarking tool, aka a way to save images from the web into visual collections which he called boards. You could organize inspiration for a home renovation, collect recipe ideas, or curate a mood board. The artifact was the pin, an image saved to a board with a link back to its source. But the design contained a network as boards were public by default. When you pinned something, it appeared in feeds of people who followed you or browsed similar categories. When someone repinned your image to their own board, it spread further, creating a huge compounding loop.</p>
+          <p>Pinterest was founded in 2009, and reached 10 million monthly users faster than any standalone site in history at the time. Today, it has $4.5Bn+ revenue and 600M MAUs.</p>
+        </div>
+
+        <h2>What comes after finding the idea?</h2>
+        <p>Your idea is a starting point. Once you have it, the work of testing begins. What is the smallest thing you can do to validate whether this idea has potential? What is the riskiest assumption, the one that, if wrong, would kill the entire idea? Don't test the easy things. Test the thing that scares you.</p>
+        <p>The winning idea will often come not from the first hunch itself, but from the insights you uncover while testing a hunch that turns out to be wrong. The customer conversations you have, the objections you hear, the adjacent problems you discover: these are the raw material of iteration. The best founders move through a cycle of hunch → test → learn → updated hunch → test again, etc, and they do this faster than anyone else.</p>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/huggingface.png" alt="">Hugging Face</div>
+          <p>Clément Delangue, Julien Chaumond, and Thomas Wolf founded Hugging Face out of Paris in Station F, as chatbot for teenagers, an AI companion that could hold casual conversations, understand emotions, and be entertaining. It was playful, almost frivolous. The chatbot gained traction but not massive retention.</p>
+          <p>In late 2018, two years after the team started the company, Google released BERT, a transformative new language model (for the time). But Google's release was inaccessible to most developers: it was super academic, locked to its own TensorFlow framework, and overall not a treat to use. The Hugging Face team, having already spent two years wrestling with exactly these kinds of models to build their AI chatbot friend, produced a clean, usable PyTorch implementation of BERT within a week. They open-sourced it.</p>
+          <p>The reaction from the ML community was massive, and that is the moment that clarified the company's actual direction. Their pivot was organic and progressive, based on the market pull they saw: they started sharing everything they'd learned about ML while building the chatbot, and within months they had become a go-to resource for the entire ML community. The chatbot was abandoned, and Hugging Face turned into the hub where developers share their models, datasets, and applications.</p>
+        </div>
+
+        <div class="rl">
+          <div class="rl-t">Reading list</div>
+          <a href="https://medium.com/entrepreneurs-first/ideas-pt-i-where-do-ideas-come-from-58ae761800a">Alice Bentinck, "Ideas Pt I: Where do ideas come from?"</a>
+          <a href="https://medium.com/entrepreneurs-first/ideas-pt-ii-finding-your-edge-8808121b591b">Alice Bentinck, "Ideas Pt II: Finding your Edge"</a>
+          <a href="https://sequoiacap.com/article/pmf-framework/">Team Sequoia, "The Arc Product-Market Fit Framework"</a>
+          <a href="https://blog.samaltman.com/idea-generation">Sam Altman, "Idea Generation"</a>
+          <a href="https://www.paulgraham.com/schlep.html">Paul Graham, "Schlep Blindness"</a>
+          <a href="https://foundersfund.com/2023/06/choose-good-quests/">Founders Found, "Choose good quests"</a>
+          <a href="https://www.saastr.com/rippling-ceo-parker-conrads-theory-of-the-compound-startup/">Parker Conrad, "Why the First Rule you Know about Building Startups is wrong"</a>
+        </div>
+      </div>
+
+      <!-- PAGE 2: HOW TO PICK THE RIGHT MARKET -->
+      <div class="page" id="page-market">
+        <h1>How to pick the right market</h1>
+
+        
+        <p>The main thing to understand about selecting the market to build your company in is that the market matters more than anything else. Market selection might be the most important thing that you have to get right.</p>
+        
+        <p>You, nor anyone else in this world, including Sam Altman, can out-execute a market that doesn't exist or that is structurally not adapted for venture scale growth. Markets are a force in startups in the same way the law of gravity is a force in physics. You cannot escape them. You can't be an exception to the force of markets. Please remember this.</p>
+        
+        <p>In our AI era, this gravity effect of markets is arguably stronger than ever before, because platform shifts compress time. Markets can appear, become crowded, and saturate within a single fund cycle, which punishes founders who rely on vibes instead of actual market pull and structural defensibility.</p>
+        
+        <p>A startup's value is fundamentally tied to its market. Even the strongest team and product cannot win where customers aren't spending. As Sequoia warns, "Nature hates a vacuum, so why hasn't your solution been built before now?". Teams that understand and win a large, urgent market can achieve PMF almost by accident; conversely, teams in unready or tiny markets end up fighting for every customer. Marc Andreessen famously put it: in a great market with many willing buyers, "the market pulls product out of the startup," making everything else easier.</p>
+        
+        <p>In short, get the market right or don't build.</p>
+        
+        <p>We've covered how to generate ideas worth testing. Now the question is: is the market behind your idea any good? To help you figure this out, we've put together a handful of criteria that the best founders and investors in the world use to think about markets.</p>
+        
+        <p>These should be used to evaluate which market you want to build in, and to give you transparency about how investors will think about your market. However, do remember that most investors - Tier1 included - get things wrong all the time. Use this checklist as a way to honestly evaluate yourself, and trust your own analysis, facts and data you gather from your customer discovery.</p>
+        
+        <p><strong>How to use this doc:</strong></p>
+        <ul>
+          <li>Use this to compare plausible markets that you could credibly pursue, and use it to exclude markets that look obviously bad.</li>
+          <li>During early customer discovery, update your beliefs about your market. Your goal is to replace narrative claims with factual observations and data, as you learn more about your market</li>
+          <li>Treat some criteria as fatal (eg, a very structurally capped number of buyers). Look for deal killers.</li>
+          <li>Inversely, look for one or two dimensions that could make a potential market unfairly good. Your market doesn't have to score well everywhere. But if you have a home run on one or two criteria, it's a good sign.</li>
+          <li>Your job, before you select a market, is to gain as much conviction as you possibly can on your market. If you're about 80% sure that you have a good market, go for it. You can never be fully sure.</li>
+        </ul>
+        
+        <p><em>ps: A Tier 1 VC will never, ever invest in your company, if they don't think that you are building in a market that can create at least a decacorn company.</em></p>
+
+        <h2>Market pull</h2>
+        <p>Is someone already trying to solve this problem, and are they struggling? Is there evidence of urgent, existing demand?</p>
+        <p>The best indicator is when potential customers are already trying (poorly) to solve the problem themselves. They're using workarounds, spending time, spending money, or dealing with pain. If no one is trying to solve it at all, it usually means either the problem doesn't exist, or the market isn't ready. Both are bad.</p>
+        <p>Market pull is your proof that the problem is real and urgent. It's the difference between a customer who is curious, and a customer who is desperate. You want desperate.</p>
+
+        <h2>Market trajectory</h2>
+        <p>Is the market growing, flat, or shrinking? You need to pick an expanding market, not a shrinking one.</p>
+        <p>A market that is expanding means new jobs are being created, new workflows are emerging, new categories are being invented. An expanding market also means that as you grow, the market itself is also growing, which makes it easier for you to gain share without cannibalizing existing players.</p>
+        <p>A contracting market means the opposite. Even if you have the best solution, you're fighting over a shrinking pie. Avoid them.</p>
+
+        <h2>Market structure & profit potential</h2>
+        <p>What does the current market structure look like, and what is the distribution of pricing power? Who captures value?</p>
+        <p>Look at existing players and who is making money. If all the value is captured by one incumbent, and switching costs are astronomical, you're fighting an uphill battle. If value is distributed (or fractured) across players, or if customers are under-served, there's room for you.</p>
+        <p>Some markets are structurally better for startups than others:</p>
+        <ul>
+          <li><strong>Platform shifts:</strong> When the underlying technology changes, the old value distribution breaks. You can win by rebuilding the workflow on new technology. Cloud computing, mobile, and AI are examples.</li>
+          <li><strong>Fragmented markets:</strong> When value is spread across many players, or when customers are under-served, there's room for consolidation or specialization.</li>
+          <li><strong>Markets with regulatory or structural headwinds:</strong> If incumbents are locked into old models for regulatory or competitive reasons, they can't easily adapt. You can.</li>
+          <li><strong>Avoid markets with:</strong> One dominant player who will crush you, network effects that only get stronger with scale for the leader, or a winner-take-all structure where you need to be #1 to survive.</li>
+        </ul>
+
+        <h2>Distribution asymmetry</h2>
+        <p>Do you have a path to reach customers that incumbents or competitors don't have? This is your distribution edge.</p>
+        <p>The product alone isn't enough. You need a way to reach customers that either doesn't exist for incumbents, or that they can't use without destroying their existing business model. Some examples:</p>
+        <ul>
+          <li>You have access to a specific audience (investors, operators, communities) that others don't.</li>
+          <li>You can reach customers in a way that is unit-economically broken for competitors (bottoms-up, free tier, etc).</li>
+          <li>Incumbents are locked into a sales model (top-down, large contracts, annual deals) that prevents them from using distribution channels you can tap into.</li>
+          <li>You have credibility in a specific niche that unlocks trust faster than competitors.</li>
+        </ul>
+        <p>Without distribution advantage, you're competing on product alone, which is hard.</p>
+
+        <h2>Speed of iteration</h2>
+        <p>How fast can you test assumptions and iterate? Some markets allow you to test weekly, others require 12-month sales cycles before you get feedback.</p>
+        <p>Fast iteration is powerful because it compresses learning. If you can run 5 test cycles in the time a competitor runs 1, you'll accumulate insights much faster. Over time, insight compounds into advantage.</p>
+        <p>Markets with fast feedback loops are better for early-stage companies. Markets with long sales cycles are brutal for startups, because you're betting on assumptions you can't quickly validate.</p>
+
+        <h2>Market depth</h2>
+        <p>How many potential customers exist, and how much money can each customer spend?</p>
+        <p>Market depth is determined by the Total Addressable Market (TAM). But TAM is a terrible metric on its own, because a huge TAM doesn't help you if you can't reach it. Instead, think about it this way:</p>
+        <ul>
+          <li>Your TAM is the set of customers who have the problem, can afford the solution, and you can credibly reach.</li>
+          <li>Your SAM (Serviceable Addressable Market) is the subset you can realistically capture.</li>
+          <li>Your SOM (Serviceable Obtainable Market) is your realistic first-year market share.</li>
+        </ul>
+        <p>You need enough total addressable customers that, if you win 5-10% of the market, you have a decacorn company (10B+ revenue). Do the math early and often.</p>
+
+        <h2>Non-consensus thesis</h2>
+        <p>Do you believe something about the market that most people don't yet believe? This is the foundation of venture returns.</p>
+        <p>If everyone already agrees that a market is huge and will grow, it's already crowded. The venture returns come from being right about something that others get wrong. Your non-consensus thesis should be specific, defensible, and contrarian (but not crazy).</p>
+        <p>Examples:</p>
+        <ul>
+          <li>"AI-native code editors will become the default development environment, not a plugin." (Cursor founders believed this when most thought Copilot plugins were the end state.)</li>
+          <li>"Design tools will move from desktop to browser, and will be collaborative by default." (Figma, when Sketch was dominant.)</li>
+          <li>"Bacteria detection will become spectral, not cultural." (Spore.Bio, when petri dishes were standard.)</li>
+        </ul>
+
+        <h2>Why now</h2>
+        <p>Why is this market opening up <em>now</em> and not 3 years ago or 3 years from now?</p>
+        <p>This is critical. Your "why now" should point to a structural change: technology matured, regulations shifted, buyer behavior changed, cost curves collapsed, something that makes the old way suddenly non-viable and the new way suddenly possible.</p>
+        <p>Without a "why now," you're just fighting an incumbent with a me-too product. With a "why now," you're riding a wave. Marc Andreessen calls this "product/market fit timing."</p>
+
+        <h2>Examples of great markets</h2>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/cursor.png" alt="">Cursor</div>
+          <div class="o">Market selection: AI-native development tools</div>
+          <p><strong>Market pull:</strong> Developers were using Copilot and desperate for better tooling integration.</p>
+          <p><strong>Market trajectory:</strong> Explosive. AI adoption compressing years into months.</p>
+          <p><strong>Market structure:</strong> Fragmented (VS Code, GitHub, various AI companies all competing). Cursor owned the Editor layer.</p>
+          <p><strong>Distribution asymmetry:</strong> Free tier + viral adoption among developers. GitHub Copilot couldn't easily become an editor without cannibalizing VS Code revenue model.</p>
+          <p><strong>Speed of iteration:</strong> Weekly feedback loops with developers.</p>
+          <p><strong>Market depth:</strong> 30M+ professional developers, each spending thousands annually on tools.</p>
+          <p><strong>Non-consensus:</strong> "Editor-first, not plugin-first, is the right architecture for AI development."</p>
+          <p><strong>Why now:</strong> LLMs crossed the threshold of being able to reason about entire codebases, not just lines. Browser technology matured. Developer expectations shifted.</p>
+        </div>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/datadog.svg" alt="">Datadog</div>
+          <div class="o">Market selection: Cloud infrastructure monitoring</div>
+          <p><strong>Market pull:</strong> AWS customers were frantically trying to monitor dynamic infrastructure but had no tools built for it.</p>
+          <p><strong>Market trajectory:</strong> Explosive and enduring. Cloud adoption is still accelerating, now 15+ years later.</p>
+          <p><strong>Market structure:</strong> Incumbent monitoring tools (Splunk, Nagios) were built for static, on-prem servers. Cloud broke their model.</p>
+          <p><strong>Distribution asymmetry:</strong> Datadog could reach developers and DevOps bottoms-up. Incumbents were locked into enterprise sales.</p>
+          <p><strong>Speed of iteration:</strong> Customers could set up and get immediate value within hours.</p>
+          <p><strong>Market depth:</strong> Unlimited and growing. Every company running cloud infrastructure needs monitoring. High spend per customer (100K-10M+ annually).</p>
+          <p><strong>Non-consensus:</strong> "Cloud monitoring is a new category, not a subcategory of existing monitoring."</p>
+          <p><strong>Why now:</strong> AWS went from experiment to production. Engineers needed visibility into dynamic infrastructure. Old tools were useless.</p>
+        </div>
+
+        <div class="cs">
+          <div class="n"><img class="cs-icon" src="startup_icons/rippling.png" alt="">Rippling</div>
+          <div class="o">Market selection: Unified employee data layer and HR/IT software consolidation</div>
+          <p><strong>Market pull:</strong> HR and IT teams were manually entering the same employee data into 10+ systems. This was a compliance nightmare.</p>
+          <p><strong>Market trajectory:</strong> Steady and growing. As companies hire globally and compliance tightens, the pain intensifies.</p>
+          <p><strong>Market structure:</strong> Highly fragmented. 200+ HR/IT tools, none talking to each other. Value distributed across many players.</p>
+          <p><strong>Distribution asymmetry:</strong> Rippling could go bottoms-up to IT and HR teams. Existing players were locked into narrow lanes (payroll only, benefits only, etc).</p>
+          <p><strong>Speed of iteration:</strong> Multi-month sales cycles, but long customer lifetime value justifies slower iteration.</p>
+          <p><strong>Market depth:</strong> Every mid-market and enterprise company needs HR/IT software. High spend per customer (250K-5M+ annually).</p>
+          <p><strong>Non-consensus:</strong> "The real product is a unified employee data layer, not any single module."</p>
+          <p><strong>Why now:</strong> SaaS had matured enough that companies were managing 100+ tools. Compliance was tightening. Cloud infrastructure made unified systems possible.</p>
+        </div>
+
+        <div class="rl">
+          <div class="rl-t">Recommended reading</div>
+          <a href="https://pmarchive.com/guide_to_startups_part4.html">Marc Andreessen, "The Only Thing That Matters"</a>
+          <a href="https://www.csun.edu/~vcact00f/497CapStone/Peter%20Thiel_%20Competition%20Is%20for%20Losers%20-%20WSJ.pdf">Peter Thiel, "Competition Is for Losers"</a>
+          <a href="https://blog.eladgil.com/p/how-can-you-tell-if-your-market-is-good">Elad Gil, "How Can You Tell if Your Market Is Good?"</a>
+          <a href="https://sequoiacap.com/article/pmf-framework/">Sequoia, "The Arc Product-Market-Fit Framework"</a>
+          <a href="https://paulgraham.com/ds.html">Paul Graham, "Do Things That Don't Scale"</a>
+        </div>
+      </div>
+
+      <!-- PAGE 3: YOUR CUSTOMER IS YOUR BOSS -->
+      <div class="page" id="page-customer">
+        <h1>Your customer is your boss</h1>
+
+        
+        <p>There are many ways to think about founding a company, but here's the truth: your customer is your boss. Not your investors. Not your board. Not yourself. Your customer.</p>
+        
+        <p>Why? Because customers are the ones who will ultimately determine whether your company lives or dies. Customers are the ones who will spend their money with you, who will spread the word, who will give you feedback, and who will hold you accountable. Everything else - fundraising, hiring, strategy - flows from the customer.</p>
+        
+        <p>When we talk about picking the right customer, we're really talking about picking the right boss. And different types of customers are different types of bosses, with different demands, different timelines, and different expectations. Your job in the earliest days is to understand these differences, and to pick the customer type that matches your strengths, your vision, and your edge.</p>
+        
+        <p>In the early days of a company, there are generally four customer archetypes: Enterprise, SMB, Prosumer, and Consumer. Each has different characteristics, and each requires a different approach.</p>
+
+        <h2>Enterprise</h2>
+        <p>Enterprise customers are large organizations with large budgets, complex needs, and long decision-making cycles. They are willing to pay high annual contract values (ACV) for solutions to mission-critical problems.</p>
+
+        <h3>Sales cycle</h3>
+        <p>Enterprise deals move slowly. Initial sales cycles are typically 6-18 months, sometimes longer. There are multiple stakeholders, procurement processes, security reviews, compliance reviews, and legal negotiations. The longer the cycle, the more you need to be prepared for objections, pivots, and re-negotiation. This also means you need cash to survive while waiting for deals to close.</p>
+
+        <h3>GTM (Go-To-Market)</h3>
+        <p>Enterprise GTM is typically top-down. You identify the companies that have the problem, you identify the right buyer (the exec who has budget and is feeling the pain), and you target them directly. This often means enterprise sales teams with account executives, account managers, sales engineers, and customer success managers. This means you're building a sales organization, not just a product.</p>
+
+        <h3>Key metrics</h3>
+        <p>Enterprise deals are measured in Annual Contract Value (ACV), typically 100K - 10M+. Sales cycles are 6-18+ months. Customer lifetime value is high (many years), but churn is possible if the product doesn't deliver. Net retention (the net value from existing customers, accounting for churn and expansion) is crucial.</p>
+
+        <h3>What your company looks like</h3>
+        <p>Enterprise companies typically look like this: you have a small founding team that closes the first few deals by hand. Then you build a sales team (VP Sales, Account Executives). You build implementation and customer success teams (because customers expect handholding through onboarding). You build presales teams (Sales Engineers who can speak technical language). You invest in compliance, security, and integration work because enterprises demand it. By the time you've closed 10 enterprise deals, you might have 30-50 people.</p>
+
+        <h3>What you need to be good at</h3>
+        <p>To win in enterprise: you need to understand buyer psychology and decision-making processes. You need sales chops - both the ability to close deals and the ability to build a sales machine. You need to be able to build trust and relationships with C-suite executives. You need operational excellence, because losing a customer who paid you 1M is catastrophic. You need the patience to navigate long sales cycles while not losing momentum.</p>
+
+        <h3>Tech challenges</h3>
+        <p>Enterprise customers demand security (SOC2, HIPAA, etc), compliance, integrations with their existing tech stack, and often white-label or on-prem deployment options. Your technical roadmap will be heavily influenced by customer demands. You'll spend a lot of time on integrations, data security, and compliance automation.</p>
+
+        <h3>Fundraising implications</h3>
+        <p>VCs love enterprise companies once they've proven they can close deals and maintain customers. Large ACVs mean you can build a multi-billion dollar company without needing millions of customers. Long customer lifetimes mean you can have excellent unit economics. If you can show traction (closed enterprise deals, positive LTV:CAC ratios), VCs will believe in you. The challenge is getting to that first proof of product-market fit when sales cycles are long and capital requirements are high.</p>
+
+        <h2>SMB (Small and Medium Business)</h2>
+        <p>SMB customers are smaller organizations with smaller budgets but still real money. They have problems similar to enterprise (workflow, efficiency, revenue), but they are more pragmatic, faster to decide, and less rigorous in their purchasing process.</p>
+
+        <h3>Sales cycle</h3>
+        <p>SMB sales cycles are much shorter than enterprise. Initial sales cycles are typically 1-3 months. There are fewer stakeholders, procurement is simpler, and decision-makers can move quickly. This means you can get market feedback faster, but it also means you need to be good at selling and at volume.</p>
+
+        <h3>GTM (Go-To-Market)</h3>
+        <p>SMB GTM is typically a mix of top-down and bottoms-up. You can reach SMB customers through direct sales (via a sales team), but you can also reach them through content marketing, communities, sales, and word-of-mouth. SMBs are often not on Gartner's radar or in Forrester reports, so they discover solutions through different channels. Many SMB winners (like HubSpot, Notion, Slack) grew through bottoms-up adoption first, then added sales teams later.</p>
+
+        <h3>Key metrics</h3>
+        <p>SMB deals are measured in Annual Contract Value (ACV), typically 5K - 100K. Sales cycles are 1-3 months. Customer lifetime value is medium (2-5 years). Churn is higher than enterprise because SMBs are more willing to switch, but the short sales cycle means you can acquire new customers quickly. CAC payback period is important (how long until the customer has paid back your acquisition cost).</p>
+
+        <h3>What your company looks like</h3>
+        <p>SMB companies often look like this: you start with a small founding team doing everything - selling, supporting, building product. You might add one or two sales people early on. You invest in product that customers can onboard themselves (self-serve). You build customer success, but through automation and templates, not high-touch services. By the time you've acquired 100+ SMB customers, you might have 15-30 people, depending on how much of GTM is bottoms-up vs direct sales.</p>
+
+        <h3>What you need to be good at</h3>
+        <p>To win in SMB: you need to be good at product. SMBs adopt products that they can use without much handholding. You need to understand their workflows and their constraints (they have less time and less money than enterprises). You need to be scrappy and efficient, because your CAC budget is lower. You need to be able to iterate quickly, because you'll get feedback faster. You need to build community and word-of-mouth, because SMBs are influenced by peers and case studies.</p>
+
+        <h3>Tech challenges</h3>
+        <p>SMB customers care about ease of use and reliability, but they are less demanding on compliance and security than enterprises. They want integrations with tools they already use (Stripe, Slack, etc), but they don't need white-label or on-prem options. Your technical roadmap will be driven more by feature requests than compliance demands.</p>
+
+        <h3>Fundraising implications</h3>
+        <p>VCs like SMB companies because they can grow quickly and reach $10M+ ARR with minimal sales team overhead. The challenge is that VCs often underestimate how long it takes to build a $1B company out of SMB. If every customer is 20K ACV, you need 50,000 customers to get to 1B revenue - which is a long road. That said, some of the most valuable companies in the world started as SMB plays (Slack, Notion, HubSpot).</p>
+
+        <h2>Prosumer</h2>
+        <p>Prosumer customers are advanced users of consumer products who are using the tool in a semi-professional capacity. They are not a company, they are an individual or a small team, but they are willing to pay (sometimes significant money) for tools that unlock their productivity or unlock new capabilities.</p>
+
+        <h3>Sales cycle</h3>
+        <p>Prosumer sales cycles are very short, often immediate. They discover the product, try it, and buy it within days. No procurement process, no committee meetings, no long deliberation. If the value is clear and the pricing is right, they'll buy.</p>
+
+        <h3>GTM (Go-To-Market)</h3>
+        <p>Prosumer GTM is almost entirely bottoms-up. You reach them through product, through content, through communities, through word-of-mouth. You typically don't have a sales team. You might have marketing and education content, but the product itself is the primary GTM lever. Freemium models often work well here - let users try for free, and convert them to paid when they need advanced features.</p>
+
+        <h3>Key metrics</h3>
+        <p>Prosumer deals are measured in Monthly Recurring Revenue (MRR), typically 10 - 1,000 per customer. Churn is important and often higher than enterprise, but acquisition is cheap (mostly organic or performance marketing). Lifetime value can be high if you build a sticky product. Network effects can be powerful (if prosumers invite other prosumers, growth is viral).</p>
+
+        <h3>What your company looks like</h3>
+        <p>Prosumer companies are often lightweight. You have a small founding team building product. You might have one or two people doing marketing/community. You don't need a sales team, you don't need customer success, you don't need professional services. Your main cost is the product team, plus infrastructure and payment processing. By the time you have millions of prosumer users, you might still have only 30-100 people.</p>
+
+        <h3>What you need to be good at</h3>
+        <p>To win in prosumer: you need to be brilliant at product. Prosumers are discerning, they know what good looks like, and they will choose your product only if it is better than alternatives. You need to be good at distribution - whether through virality, word-of-mouth, or performance marketing. You need to understand their pain deeply and solve it better than anyone else. You need to build community, because prosumers are influenced by other prosumers. You need to move fast and iterate, because you'll have thousands of opinionated users providing feedback.</p>
+
+        <h3>Tech challenges</h3>
+        <p>Prosumer products need to be reliable and performant, but they don't need the compliance and security infrastructure of enterprise products. They do need to handle scale (millions of users). They often benefit from mobile optimization and offline-first design. They need to be intuitive and have low friction to onboarding.</p>
+
+        <h3>Fundraising implications</h3>
+        <p>VCs are split on prosumer companies. Some love them because they can scale to massive scale (millions of users) with minimal sales overhead, and have excellent unit economics (high LTV relative to CAC). Others worry because converting users to paid is hard, and CAC is often higher than expected. However, some of the most valuable companies in the world are prosumer plays (Figma, Notion, Canva).</p>
+
+        <h2>Consumer</h2>
+        <p>Consumer customers are individual humans using a product for personal reasons, not professional ones. This includes everything from social media to games to productivity tools.</p>
+
+        <h3>Sales cycle</h3>
+        <p>Consumer sales cycles are instantaneous. Users discover the product, they use it immediately, they decide if they like it, all within minutes. If they do, they might pay. If they don't, they leave forever.</p>
+
+        <h3>GTM (Go-To-Market)</h3>
+        <p>Consumer GTM is almost entirely bottoms-up and often goes viral. You build a product that people want to use and share. You reach them through word-of-mouth, social media, app stores, influencers, performance marketing, and viral loops (if you build them in). You typically don't have a sales team.</p>
+
+        <h3>Key metrics</h3>
+        <p>Consumer metrics are obsessed with growth. Monthly active users (MAU), daily active users (DAU), engagement metrics (session length, frequency), churn rate. Monetization can come through ads, premium subscriptions, or marketplace fees. ARPU (average revenue per user) is typically much lower than SMB or enterprise.</p>
+
+        <h3>What your company looks like</h3>
+        <p>Consumer companies are typically capital-intensive but lean on headcount. You have a small founding team building product and managing community. You might have people doing growth/marketing, but much of that is performance marketing or social media. You have operational people handling infrastructure, support, and business operations. By the time you have millions of consumer users, you might have 50-200 people, depending on how much you've monetized and whether you've built a community/support organization.</p>
+
+        <h3>What you need to be good at</h3>
+        <p>To win in consumer: you need to be obsessed with product and user experience. Consumer products live or die on delight. You need to understand user psychology and what makes something sticky or shareable. You need to be good at growth and distribution - whether through viral loops, influencer partnerships, or performance marketing. You need to be able to build at speed and iterate based on user feedback. You need to build a community and culture around the product. You need to have fun - consumers can smell inauthenticity from a mile away.</p>
+
+        <h3>Tech challenges</h3>
+        <p>Consumer products need to scale to handle millions of concurrent users. They need to be fast, responsive, and reliable. They need to work on mobile. They need to be optimized for different demographics and geographies. They typically don't need compliance or security features, but they do need privacy (GDPR, etc).</p>
+
+        <h3>Fundraising implications</h3>
+        <p>VCs are historically skeptical of pure consumer companies because they are capital-intensive and the path to $1B+ revenue is unclear. However, winners like TikTok, Discord, and Figma have shown that consumer products can reach massive scale and valuations. The challenge is that monetization is hard and unpredictable, and you need to nail product-market fit before you can worry about revenue.</p>
+
+        <h2>Which customer type is right for you?</h2>
+        <p>The answer depends on your edge, your vision, and your team.</p>
+        
+        <p><strong>Pick Enterprise if:</strong> You have deep expertise in a vertical (healthcare, finance, etc) or in a specific workflow. You have sales experience or can hire experienced salespeople. You are patient and can survive long sales cycles. You want to build a smaller, high-value customer base. You believe the problem you're solving is mission-critical and worth paying for.</p>
+        
+        <p><strong>Pick SMB if:</strong> You understand SMB workflows and constraints. You can build product that SMBs can self-serve with minimal support. You are good at bottoms-up GTM or can build a small sales team. You want to grow quickly and reach 10M+ ARR with a small team. You believe SMBs are underserved relative to enterprise solutions.</p>
+        
+        <p><strong>Pick Prosumer if:</strong> You understand what advanced users want and are frustrated by. You can build product that is 10x better than consumer alternatives. You are good at community building and virality. You want to build a product with massive reach but with smaller transaction sizes. You believe prosumers will evangelize your product.</p>
+        
+        <p><strong>Pick Consumer if:</strong> You understand what regular humans want and are delighted by. You can build product that is so good people want to use it for fun. You are good at growth and distribution. You can survive long runway to monetization. You want to build a product with massive reach and impact, even if revenue is uncertain.</p>
+        
+        <p>Here's the hard truth: your customer type choice is not a starting point, it's a bet. You're betting that you understand this customer better than anyone else, that you can build something they'll pay for, and that you can reach them efficiently. And the best way to win this bet is to spend time with your potential customers, understand their constraints, and let them tell you what they actually need.</p>
+
+        <div class="rl">
+          <div class="rl-t">Recommended reading</div>
+          <a href="https://medium.com/craft-ventures/enterprises-vs-smbs-whos-the-better-customer-for-b2b-saas-startups-9a0d4efe69e9">Craft Ventures, "Enterprises vs SMBs"</a>
+          <a href="https://www.lennysnewsletter.com/p/what-is-good-retention-issue-29">Lenny Rachitsky, "What is good retention"</a>
+          <a href="https://a16z.com/16-startup-metrics/">a16z, "16 Startup Metrics"</a>
+        </div>
+      </div>
+
+
+<div class="page" id="page-discovery">
+    <h1>How to do effective customer discovery</h1>
+
+
+    <p>Customer discovery means talking to the people you think you're building for to better understand what they want. It sounds simple but it really isn't. Humans are polite and confusing, founders are biased, and there is a LOT of noise to cut through to get to some form of signal.</p>
+
+    <p>The main thing to know is that customer discovery needs a system to be efficient. This doc gives you the system, and shares tips and tricks that have worked for other founders.</p>
+
+    <h2>Customer discovery is about validating 5 things, in the following order</h2>
+
+    <p>Once you've had a bunch of initial conversations, and narrowed in on a problem space you want to build in, and a general idea of the problem you want to solve; you can start building your system for customer discovery.</p>
+
+    <p>When you're doing customer discovery, every step is interdependent with the other - aka, your problem depends on your ICP, your price depends on your problem, etc. Hence, there is a correct sequence to test when doing customer discovery. Each step should be validated before you invest heavily in the next.</p>
+
+    <h3>Step 1: ICP</h3>
+
+    <p>Once you've had enough conversations with different players within a single problem-space (20-40+), patterns will start to emerge. Some people you talk to will lean forward, get excited, and want to keep talking. Others will nod politely and won't commit. The ones who lean forward are your ICP (ideal customer profile). Your job is to figure out what they have in common.</p>
+
+    <p><strong>What is an ICP?</strong>: "Small businesses", "developers", "CPG enterprise companies" is not an ICP. Your ICP needs at least three specific, measurable attributes that let you find these people in the real world and tell immediately whether someone fits or not. The best founders get absurdly narrow at the start. The goal is to expand later, once you've won the wedge.</p>
+
+    <ul>
+      <li>Gusto started with six ICP attributes: companies with five or fewer employees, in California, offering no benefits, with only salaried employees, no contractors, and willing to wait eight days after running payroll to get paid.</li>
+      <li>Snyk started with: developers building with Node.js who were security-conscious.</li>
+    </ul>
+
+    <p>You obviously won't start this narrow from Day 1, but your goal is to get to this precision eventually.</p>
+
+    <p><strong>How do you find your ICP?</strong> Talk to 20-40+ people who you think might have the problem. Look for who leans in. Look at: which people got most excited? What do they have in common? Which people said "I want this now" versus "that's interesting"? Which people asked about pricing, unprompted?</p>
+
+    <p>When you find a cluster of people who all respond with real enthusiasm, and they share identifiable traits (industry, company size, role, specific technology, specific pain point), that's your ICP.</p>
+
+    <h3>Step 2: problem</h3>
+
+    <p>Once you've identified who you're building for, understand exactly what they're struggling with: what it actually means for them, in their words, in their workflow, in their daily reality.</p>
+
+    <p>What does the problem look like, in practice? How much is it costing them? Go deep in your understanding of the impact / cost of the problem, and exactly how it shows up in your users' and customers' workflows.</p>
+
+    <h3>Step 3: promise</h3>
+
+    <p>Before you build anything, frame a compelling promise of how you'll take your customer from their pain to a better outcome. The promise is not a feature list but the transformation you want to make happen: "You currently spend 5 days waiting for bacterial test results. With us, you get results in 10 minutes." That's Spore.Bio's promise.</p>
+
+    <p>Good promises are quantified: a percentage improvement, a time reduction, a cost saving, a risk eliminated. Your promise should be compelling enough that someone who has the problem can immediately assess whether it would change their life.</p>
+
+    <p>Test the promise in your conversations before you build anything. Watch for the reactions. If you can't get at least a few people to say something like "when can I have this?" from the promise alone, you have an issue with your promise / problem, not with your product.</p>
+
+    <h3>Step 4: price</h3>
+
+    <p>This is where most founders flinch because they think it feels premature to talk about money before you've built anything. But testing willingness to pay is one of the most important things you can do early, because it separates real demand and market pull from just polite curiosity.</p>
+
+    <p>You don't need a finished product to test pricing. You need a clear enough promise that someone can evaluate whether it's worth paying for. Then, use a commitment test and gradually test more specific pricing points: "Would you sign a letter of intent?" "Would you put down a deposit for early access?" "Would you pay for a pilot?"</p>
+
+    <p>A useful hack from Michael Sippey (former VP Product, Twitter): throw out a deliberately high number. "What if it cost $1,000?" Watch their reaction. They'll often reflexively say something like "No way, I'd never spend more than $150 on that." And there's your price anchor. Test higher and higher pricing with next customers until you hit a definite ceiling.</p>
+
+    <h3>Step 5: product</h3>
+
+    <p>Only once you've validated steps 1 through 4, you should invest in building product more seriously. It must be the right product for the right problem, for the right customer, at the right price.</p>
+
+    <p>This doesn't mean you can't use a mock-up or a very simple MVP earlier to test your promise or make conversations more concrete, but don't invest and substantial time nor money before you're confident on steps 1-4.</p>
+
+    <h3>And now, iterate</h3>
+
+    <p>The journey of validating the right ICP, problem, promise, price, and product is iterative, not linear. You will not get each step right on the first try. The goal is to be wrong in a way that teaches you something, and to learn faster than everyone else. Keep a log: what did you believe going in, what did you learn, what changed. Update as you go.</p>
+
+    <h2>Tips for how to do this in practice</h2>
+
+    <h3>The core principle: extract behavior, not opinions</h3>
+
+    <p>Rob Fitzpatrick who wrote the definitive book on this (The Mom Test), puts it bluntly: if you're getting compliments in your customer interviews, you're doing it wrong. What counts as data is behavior, concrete things people have actually done in the past. Behavior is factual. If you ask 100 people what they did yesterday when they encountered a specific problem, you'll get roughly the same answer from all of them. If you ask 100 people what features they'd like, you'll get 100 different answers, none of which are reliable.</p>
+
+    <p>The rule: talk about their life, not your idea. Ask about what they've done, not what they'd do. Ask about the past, not the future. Ask about specifics, not generalities.</p>
+
+    <p><strong>Bad questions:</strong></p>
+    <ul>
+      <li>"Do you think this is a good idea?" (leading, opinion, yes/no)</li>
+      <li>"Would you use a product that does X?" (hypothetical)</li>
+      <li>"What features would you want?" (hypothetical, and they'll invent things they don't actually need)</li>
+    </ul>
+
+    <p><strong>Good questions & five questions you can always ask:</strong></p>
+    <p>These five questions, adapted from YC's Diana Hu, work at every stage of customer discovery. They are a reliable backbone for any conversation.</p>
+
+    <ol>
+      <li>"What is the hardest part about doing X?" - This gets to the core pain. You want to find situations that occur frequently enough or are painful enough to be worth solving.</li>
+
+      <li>"Tell me about the last time you encountered that problem." - This forces the person to give you a specific, detailed story rather than a generalization. While you're listening, you may not realize what's important, but when you review your notes later, gold nuggets will appear. This question gives you context about how the problem shows up in their actual life.</li>
+
+      <li>"Why was that hard?" - This is the question that gives you your marketing copy. When people explain why something is hard, they use the language your future customers will use. They tell you what they care about. Pay close attention to the exact words they use, you should reuse them.</li>
+
+      <li>"What, if anything, have you done to try to solve the problem?" - This question does two things. First, it reveals your actual competitors (not the ones you imagined, but the ones your users are actually using). Second, it qualifies how serious the user is. If someone is actively trying to solve the problem, even with duct tape and spreadsheets, that's a strong signal. If they've never bothered to look for a solution, the problem probably isn't painful enough.</li>
+
+      <li>"What don't you love about the solutions you've tried?" - This is better than asking "what features would you want?" because it's grounded in real experience. The person tells you specifically what's broken about their current workaround, which gives you a starting point for your feature set that's rooted in reality rather than imagination.</li>
+    </ol>
+
+    <h3>How do I structure each customer discovery conversation?</h3>
+
+    <p>Prepare a plan for every conversation. You only need 15-30 minutes, and you should be listening at least 80% of the time.</p>
+
+    <ul>
+      <li><strong>Zoom out → Zoom in → Zoom out.</strong> Start broad (how do they work, what does their day look like, what tools do they use), then narrow to the specific problem area you care about, then zoom back out to ask what matters most overall. This structure prevents you from anchoring the conversation too early and missing adjacent problems that might be more important than the one you came in to discuss.</li>
+
+      <li><strong>Set a goal before each conversation.</strong> You need to know, before you pick up the phone, what you're trying to do. There are two types of interview goals:
+        <ol>
+          <li>Learning goal: a specific fact you want to uncover. Example: "How do they currently monitor efficiency?" or "Who has the budget authority to buy this?"</li>
+          <li>Commitment goal: a concrete next step you want the person to take. Example: a paid pilot, an introduction to a colleague, permission to observe their workflow, or simply agreeing to a second conversation.</li>
+        </ol>
+        If your conversation doesn't end with either a new fact that changes or confirms your current understanding, or a concrete commitment, it was probably wasted.</li>
+
+      <li><strong>Debrief after each conversation.</strong> Do not let the insight fade. Within 15 minutes of ending a conversation, sit down (ideally with your cofounder) and do a quick debrief on three things:
+        <ol>
+          <li>Data: What specific facts did you learn? What did the person say (direct quotes) and show (body language, tone, emotion)? What confirmed your hypothesis? What contradicted it?</li>
+          <li>Insights: What interpretation can you draw? What patterns are emerging across conversations? Be honest about whether the pattern is real or whether you're seeing what you want to see.</li>
+          <li>Action: What specifically will you change as a result of this conversation? A question to ask next time? A new ICP hypothesis?</li>
+        </ol>
+        At the end of each week, do a longer synthesis. Look across all the conversations from that sprint. Which themes keep repeating? Where are there contradictions? What surprised you?</li>
+    </ul>
+
+    <h3>How do I find the people to talk to?</h3>
+
+    <p>Start with people you can actually reach. Five deep conversations with the right people teach you more than fifty shallow ones with random strangers.</p>
+
+    <ul>
+      <li><strong>Start on easy mode with low hanging fruit.</strong> Talk to friends, former colleagues, and people in your network who are close to the problem. These conversations will be lower-stakes and will help you practice before you talk to the people who really matter.</li>
+      <li><strong>Then graduate to cold outreach.</strong> LinkedIn messages, email, and X DMs all work if you're specific about why you're reaching out and what you want.</li>
+      <li><strong>Go where your customers naturally gather.</strong> Find the conferences, Slack communities, subreddits, trade shows, or physical locations where your target customers spend time, and show up.</li>
+    </ul>
+
+    <h3>How many conversations do I need to have?</h3>
+
+    <p>You can get remarkably strong signal from 5-8 deep conversations with the same type of person, as long as you're focused on one specific question or hypothesis per sprint. Plan for at least 25-40 conversations total, focussing on different areas of discovery.</p>
+
+    <h2>How do I know if the customers are speaking to are really serious?</h2>
+
+    <p>The hardest lesson in customer discovery is learning to distinguish genuine interest from polite encouragement. Most of the signals you receive will be encouraging but meaningless. The most important thing to understand is that commitment is measured by what someone gives up, not what they say. Time, money, and social capital (introducing you to their boss) are the only real currencies. Money is much better than time and social capital. Be blunt about this, and don't fool yourself.</p>
+
+    <p>Ask the question you're terrified to ask. "Will you sign this contract today?" If they say no, that's data. "Can you introduce me to your VP?" If they hesitate, that's data. The answers that make you uncomfortable are the ones that move you forward.</p>
+
+    <p><strong>Bad signals:</strong> "Send me the link when it's ready." "We should definitely stay in touch."</p>
+
+    <p><strong>Good signals involve real cost aka money (ideally), time, or reputation:</strong></p>
+    <ul>
+      <li>They agree to a paid pilot, even a small one</li>
+      <li>They introduce you to other people in their company or network</li>
+      <li>They share proprietary data or give you access to their systems</li>
+      <li>They carve out time for a follow-up meeting and put it on the calendar</li>
+      <li>They ask "how much does it cost?" without you bringing up pricing</li>
+      <li>They start describing their implementation plan before you've even finished the demo</li>
+    </ul>
+
+    <h2>When am I "done" with customer discovery?</h2>
+
+    <p>Customer discovery is never truly finished. But there are clear signals that you've done enough to move forward with conviction:</p>
+    <ul>
+      <li>You can describe your ICP with at least three specific attributes, and you've validated it with at least 5-10 conversations with people who match</li>
+      <li>You can name the specific problem you're solving, in the exact words your customers use to describe it</li>
+      <li>You know what your customers are currently doing to solve the problem (their workarounds, competitors, and duct-tape solutions)</li>
+      <li>You know what they'd pay, not because they told you "sure, I'd pay for that" (which is hypothetical) but because you can see what they're already spending on alternatives, and they've agreed to a specific number</li>
+      <li>At least two people from the same ICP have given you a real commitment: a paid pilot, a signed LOI, a deposit, or at the very minimum, dedicated time and access to help you build the right thing</li>
+    </ul>
+
+    <p>If you have all of these, you're ready to build. If you're missing any of them, keep talking. The conversations you skip now are the months you'll waste later building the wrong thing.</p>
+
+    <div class="rl">
+      <div class="rl-t">Recommended reading</div>
+      <a href="https://www.momtestbook.com/">Rob Fitzpatrick, "The Mom Test"</a>
+      <a href="https://www.youtube.com/watch?v=z1iF1c8w5Lg">YC, "How To Talk To Users"</a>
+      <a href="https://review.firstround.com/how-to-know-if-your-ideas-the-right-one-a-founders-guide-for-successful-early-stage-customer-discovery/">First Round, "A Founder's Guide for Successful Early-Stage Customer Discovery"</a>
+      <a href="https://review.firstround.com/the-power-of-interviewing-customers-the-right-way-from-twitters-ex-vp-product/">First Round, "'Get in the Van' and Other Tips for Getting Meaningful Customer Feedback"</a>
+      <a href="https://www.lennysnewsletter.com/p/how-to-identify-your-ideal-customer">Lenny Rachitsky, "How to identify your ideal customer profile (ICP)"</a>
+      <a href="https://newsletter.posthog.com/p/defining-our-icp-is-the-most-important">PostHog, "Defining our ICP is the most important thing we ever did"</a>
+      <a href="https://a16z.com/podcast/do-you-know-your-icp/">a16z, "Do You Really Know Your ICP? Why It Matters and How to Find Out"</a>
+      <a href="https://sequoiacap.com/podcast/crucible-moments-doordash/">Sequoia, "DoorDash ft. Tony Xu - The 'Wrong' Moves That Built a Giant"</a>
+    </div>
+</div>
+
+<div class="page" id="page-outreach">
+  <h1>How to do effective outreach</h1>
+
+
+  <p>Outreach is a pipeline you build to repeatedly to reach the right people, run good conversations, and convert the best ones as customers.</p>
+  <p>This doc is a playbook for helping you efficiently build and run this pipeline across warm network, intros, cold outreach, and more creative approaches.</p>
+
+  <h2>Mental models</h2>
+
+  <h3>Outreach is annoying and painful but incredibly high leverage. Do not outsource it in early stages.</h3>
+  <p>High-quality early outreach is manual, long, and painful. But it's your job as a founder, and under no circumstances should you outsource or try to automate this process in early stages. It's often when you do outreach, that you learn key information about the market pull and about your ICP, promise, pricing etc.</p>
+  <p>As an early-stage founder, nobody knows your company and your brand opens zero doors. But when the outreach comes from a founder who has clearly done the research, who understands the customer's problem, who is willing to give their personal phone number and say "call me anytime": that works in a way no sales team can replicate. People are making a bet on you personally, not on your company. You need to lean into that and put your name, your story, and your personal commitment in every interaction. The emails you send this week may produce the relationships that shape your entire company. Treat them accordingly. You only need one really good first customer to get things off the ground.</p>
+
+  <h3>Treat outreach like a measurement system</h3>
+  <p>Your should really think of outreach as a measurement system for <em>do people care enough about my problem</em>? In Sequoia's PMF pressure test, one of the earliest positive indicators is a high hit rate on cold outreach, because it's closer to truth than friendly responses from people predisposed to be nice.</p>
+  <p>That's why you should treat outreach like an experiment with inputs and outputs, and data signals to measure efficacy:</p>
+  <p>Inputs you control:</p>
+  <ul>
+    <li><strong>Targeting</strong> (who you reach aka how on point is your ICP)</li>
+    <li><strong>Value proposition</strong> (what you're offering aka how good is your promise)</li>
+    <li><strong>Friction</strong> (how hard it is to respond aka how well crafted is your outreach message)</li>
+    <li><strong>Channel</strong> (email, phone, LinkedIn, community, in-person)</li>
+    <li><strong>Execution</strong> (follow-ups, iteration frequency)</li>
+  </ul>
+  <p>Outputs you can measure:</p>
+  <ul>
+    <li><strong>Opens / acceptance</strong> (weak signal; often just curiosity)</li>
+    <li><strong>Replies</strong> (stronger)</li>
+    <li><strong>Meetings that happen</strong> (strong)</li>
+    <li><strong>Depth of engagement</strong> (very strong: do they bring data, invite teammates, share docs, ask for next steps?)</li>
+    <li><strong>Commitment</strong> (strongest: pilot, LOI, paid trial, intro to decision maker)</li>
+  </ul>
+  <p><strong>How to run this funnel:</strong> Build the funnel backwards (this is the non-negotiable mental model). Start from "I need 3 pilots in month 1" and work backward: how many meetings, replies, and targeted messages does that require given your conversion rates? What can you test to optimize conversion rates? If the conversion rates are terrible, are you sure you're solving the right problem?</p>
+
+  <h2>Step 1: start with low hanging fruit (= your existing network)</h2>
+  <p>Your first conversations should come from people who you already know - either that are directly relevant to your problem space, or who can introduce you to people that are. These people will not necessarily become your customers (they probably won't), but they will allow you to learn, and hopefully, eventually, lead you to actual customers.</p>
+  <p><strong>Who to reach out to first:</strong> start with people you know from the obvious networks. Former colleagues and managers from any job you've held; uni classmates, professors, and alumni networks; friends and family who work your target market; fellow founders (especially from The Bridge, EF, or other programs) - they tend to get the pain and respond well; people you've interacted with on X, LinkedIn, etc.</p>
+  <p><strong>If you're asking to be connected to someone, write a good, forwardable email to minimize friction.</strong> The best practice is double opt-in intros: the connector asks the recipient if they want the intro before connecting. This is where most founders shoot themselves in the foot: they make the intro a writing project for the connector. Instead, send a crisp, forwardable email addressed to the final recipient, so the introducer can forward in 15 seconds without any hassle at all and minimal cognitive load on the connector.</p>
+  <p>The correct process for requesting an introduction:</p>
+  <ol>
+    <li><strong>Identify the specific person</strong> you want to meet. "I'd love to connect with Sarah B, VP Engineering at Datadog" not "can you connect me with someone at Datadog."</li>
+    <li><strong>Ask the introducer if they'd be willing</strong> to make this specific connection. Tell them you'll write a separate email they can simply forward; all they'll need to do is add a line and hit send.</li>
+    <li><strong>Write a self-contained forwardable email.</strong> This is a brand new email (not a reply in the existing thread) with a custom subject line, your company blurb, and a specific call to action. It should be readable in under 45 seconds and forwardable from a phone. Most likely, the introducer will forward it with their own note and are not going to CC you blindly. They'll ask the recipient if they're open to connecting.</li>
+    <li><strong>When connected, respond immediately,</strong> within half an hour if possible. Speed signals seriousness to both the recipient and the introducer.</li>
+    <li><strong>Close the loop with the introducer.</strong> After the meeting happens, tell them how it went. This is common courtesy, and it makes them more likely to intro you again.</li>
+  </ol>
+  <p>A good forwardable intro email has:</p>
+  <ul>
+    <li>a credibility hook (relevant background, something nice you share in common, edge, traction, customers)</li>
+    <li>2-4 sentences "what we do + why you're reaching out"</li>
+    <li>a very low-friction CTA ("open to 15 min next week?" / "can I send 3 questions over email?")</li>
+  </ul>
+  <p><strong>The networking multiplier:</strong> At the end of every single conversation you run, ask: "Is there anyone else you think I should talk to about this?" This one question consistently produces the highest-quality leads in early-stage outreach because it comes with a warm introduction attached. If someone gives you a name, ask them to make the intro rather than reaching out cold and saying "so-and-so suggested I contact you". The warm handoff will convert higher than a cold email that merely name drops the referrer.</p>
+
+  <h2>Step 2: cold outreach</h2>
+  <p>Once you've dried out warm conversations, you should have a clearer sense of who you're looking for. Now it's time to reach strangers. Most cold emails are generic, self-centered, too long, and obviously automated. If you write a short, personalized, human message that demonstrate you've actually thought about the recipient, you will get responses (assuming you put the reps in).</p>
+
+  <h3>How to write a good cold emails</h3>
+  <ul>
+    <li><strong>Keep it (very) short.</strong> Five to seven sentences maximum. Your email should be readable on a phone screen without scrolling. If someone has to invest cognitive effort to figure out what you want, they'll archive it.</li>
+    <li><strong>Make a specific, low-friction ask - have a single, specific goal.</strong> "Could I get 15 minutes this week to learn how your team handles X?". The ask should be so small that saying yes is easier than thinking about it.</li>
+    <li><strong>Write like a human, not a company.</strong> Use your personal name as the sender. Write "hi" not "Dear Madam." Use lowercase, use contractions, write the way you'd text a colleague.</li>
+    <li><strong>Establish credibility in one line.</strong> The recipient needs a reason to take you seriously before they'll read further and give you their time. Write a short sentence to establish yourself as credible: "I'm a former ML engineer at Hugging Face, now building X" or "I'm a founder working on X" or "I've spent 6 years in food safety testing." The best credibility signals are institutional brands (employers, universities, accelerators), hard things you've done, or people they know.</li>
+    <li><strong>Make it about them.</strong> The email should be about the reader, not about you. "I've been talking to factory managers who tell me contamination testing takes 5 days and costs them X per incident. I'm exploring whether there's a way to cut that to minutes by using new technology X." This tells the recipient you understand their world and invites them to engage on something they care about.</li>
+    <li><strong>Follow up.</strong> Most people don't respond to the first email because they're busy. Plan to follow up 2-3 times, spaced a few days apart. Keep follow-ups even shorter: "Just bumping this, would love 15 minutes if you have time this week." Don't get frustrated if someone doesn't respond (nobody owes you anything).</li>
+    <li><strong>Show extra effort, be creative (but not crazy).</strong> The fastest way to get replies is to do part of the job before they respond. For example, you could build a short loom-style video showing how you'd solve some part of their problem.</li>
+  </ul>
+
+  <h3>Finding email addresses</h3>
+  <p>This is a solved problem. Use tools like Apollo.io etc to find professional email addresses. LinkedIn Sales Navigator lets you filter by company, title, seniority, and geography. You can often guess email formats (firstname@company.com or firstname.lastname@company.com) once you know the pattern at a target company.</p>
+
+  <h3>LinkedIn outreach</h3>
+  <p>LinkedIn works differently from email. Connection requests with no message attached actually have a higher acceptance rate than those with a long note. Once someone accepts your connection, then send a short, personalized message. A few things to have in mind:</p>
+  <ul>
+    <li><strong>Volume limits:</strong> with a free account, send no more than 20-30 connection requests per day. Going higher triggers LinkedIn's spam detection and can get your account restricted. Withdraw pending requests older than 10-15 days.</li>
+    <li><strong>Keep messages short.</strong> LinkedIn messages between 200-400 characters have the highest response rates. This is roughly 2-3 sentences. Treat it like a text message.</li>
+    <li><strong>LinkedIn Sales Navigator</strong> is worth the investment: advanced filters for title, seniority, company size, and technology stack.</li>
+  </ul>
+
+  <h3>X outreach</h3>
+  <p>For certain audiences (developers, founders, designers), X DMs can be more effective than email. You should engage with their public content first (reply to tweets, quote-tweet with a thoughtful addition), then DM with a short, specific ask. The advantage of X is that your public presence serves as credibility. If you've been sharing interesting thoughts about the problem space, the recipient can quickly assess whether you're worth talking to.</p>
+
+  <h2>Step 3: go where your customers live - communities, conferences, etc</h2>
+  <p>The highest-quality outreach often isn't an email or a DM at all. It's showing up in the physical or digital spaces where your target customers already spend time, and starting conversations face-to-face.</p>
+
+  <h3>In-person events</h3>
+  <p>Trade shows, conferences, industry meetups, and professional gatherings are goldmines for early-stage founders. The conversion rate from an in-person conversation is dramatically higher than from any digital channel, because you get the full context, body language, tone, real-time reactions, and because people are in a mode where they expect to meet new people. The common pattern: go to where your customers physically are, bring something (value, food, a demo, something fun), and start conversations.</p>
+  <ul>
+    <li>Tracy Young, cofounder of PlanGrid (construction software, acquired by Autodesk for $875M), went to construction sites and brought doughnuts. She didn't have an app. She didn't have a pitch deck. She had doughnuts and questions. She'd walk up to workers and site managers and ask how they handled blueprints. These conversations shaped the product that construction workers actually wanted to use.</li>
+    <li>Scale AI's founding team went to CVPR (a major computer vision conference) with laptops, pitching their data labeling service from booth to booth. They didn't have a booth of their own. They just showed up and talked to every company building autonomous vehicles, face-to-face, about their data labeling pain.</li>
+    <li>Uber's early team used street teams at the Caltrain station, handing out referral codes. Travis Kalanick personally went to Twitter's headquarters and distributed codes.</li>
+  </ul>
+
+  <h3>Online communities</h3>
+  <p>Many customer segments have rich online places where they hang out, discuss problems, share solutions, and evaluate tools. These are free intelligence sources and outreach channels if you use them well.</p>
+  <ul>
+    <li><strong>Reddit and Hacker News:</strong> classic gold-mine. If your customers are developers, technical leaders, or startup founders, these communities are essential. Participate genuinely: answer questions, share insights, contribute value.</li>
+    <li><strong>Slack and Discord communities:</strong> Many industries have active Discord channels / Slack groups (SaaS, DevOps, marketing, fintech, AI/ML). Join them and read, listen. Then engage when you have something genuinely useful to contribute.</li>
+    <li><strong>Industry-specific forums and groups:</strong> Construction has its forums. Manufacturing has its trade publications. Finance has its LinkedIn groups. Whatever industry you're targeting, find where practitioners talk to each other and start participating.</li>
+  </ul>
+
+  <h3>Content as outreach</h3>
+  <p>Writing publicly about the problem you're solving is one of the most effective long-term outreach strategies. Blog posts, X threads, LinkedIn posts, and even short videos that demonstrate deep understanding of your target customer's problems will attract exactly the people you want to talk to.</p>
+
+  <h2>How much outreach is enough outreach?</h2>
+  <p>Most founders dramatically underestimate the volume of outreach required, and give up / discard a problem space just because they haven't put the outreach reps in. A typical (successful!) B2B outreach funnel could be: if you send 800 emails, roughly 400 get opened (50%), 40 generate responses (10%), 10 convert to demos (25%), and 1 becomes a customer (10% or 0.125% of your original 800). That means you need to be sending dozens of emails per day, not a handful per week.</p>
+  <p>At the early stage, you should be blocking off <strong>3-4 hours per day for outreach only</strong>. Track everything. Measure open rates, response rates, and conversion to meetings. If your open rates are below 40%, your targeting or subject lines are off. If your response rates are below 10%, your email copy or value proposition needs work. If people take meetings but don't convert to next steps, your product or promise isn't resonating.</p>
+  <p>Start manual. Write every email yourself. Once you've found copy that consistently generates responses, then you can start to templatize and scale. <strong>But never automate before you've validated the message by hand.</strong> Your early emails will be bad but that's fine. Iterate. Each batch should be slightly different based on what you learned from the last one.</p>
+
+  <h2>Founder stories to get you inspired on outreach</h2>
+  <p>When standard channels aren't enough, the best founders get creative.</p>
+
+  <div class="cs">
+    <div class="n">Stripe</div>
+    <p>Stripe's founders didn't wait for people to sign up. When they met a founder at any event who expressed interest, Patrick Collison would say "give me your laptop" and set up Stripe integration on the spot. By the time the conversation was over, the founder was a Stripe customer. This eliminated every source of friction between interest and adoption.</p>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- INDEX -->
-    <div class="page active" id="page-index">
-      <h1>Index</h1>
-      <p>These six documents are the condensed thinking behind idea generation, market selection, customer types, discovery, outreach, and how to introduce yourself. They are written for founders of The Bridge, and designed to give everyone in the cohort a baseline understanding of the key topics covered in the program.</p>
-      <p>Each document is a standalone reference. Read them in order or jump to what you need. Use them before talks, during customer discovery, and when you need to pressure-test your thinking.</p>
-    </div>
-
-    <!-- 1. IDEA -->
-    <div class="page" id="page-idea">
-      <h1>How to find your idea</h1>
-
-      <p>When you're looking for your startup idea, start from what you uniquely know, have seen, or can build. You're not here to build any company. You want to build the company you are most likely to win with, and you're most likely to enjoy building.</p>
-      <p>Your idea is a starting point, not a destination. You will test it, break it, reshape it, and eventually arrive at something you could never have planned from day one. Ideation is not finished until you reach PMF. Everything before that is iteration.</p>
-
-      <h2>> Understand your edge</h2>
-      <p>Most founders approach startups with a goal-first mindset: decide the best idea, then figure out how to build it. Under real uncertainty, the winning pattern is usually the opposite: start from the means you actually have, and discover what outcomes become possible.</p>
-      <p>Your edge is your unfair advantage. It's built on who you are (skills, taste, obsessions), what you know (domains, insights, experiences), and who you know (network, access). Describe the key few things you can do that most founders cannot. Be specific.</p>
-      <ul>
-        <li><em>"I designed the guardrail architecture that let a healthcare company deploy LLMs into clinical note summarization"</em></li>
-        <li><em>"I built the perception-to-control stack that let warehouse robots grasp thousands of SKU variants"</em></li>
-        <li><em>"I can get 20 procurement-grade conversations in fintech risk within a week"</em></li>
-      </ul>
-
-      <h2>> Prompts to help you find ideas</h2>
-
-      <h3>Find a belief about the future, and build towards it</h3>
-      <p>Based on what you uniquely know and can build, what do you believe could be fundamentally different in 5-10 years? Name both the belief and the mechanism that will lead to this change. The mechanism is the only way to add credibility.</p>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/canva.png" alt="">Canva</div>
-        <p class="o">Founded 2012. $4Bn ARR, 265M users, $42Bn+ valuation.</p>
-        <p>Melanie Perkins was 19, teaching classmates Photoshop. She watched them spend an entire semester just learning where the buttons were. Her core belief: visual communication would overtake text as the primary language of the internet. The enabling forces: HTML5 making rich in-browser editing viable, social media exploding, mobile making images dominant. The first 100+ investors passed.</p>
-      </div>
-
-      <h3>"This is hard, it shouldn't be this hard"</h3>
-      <p>Notice a process you know well that is absurdly slow, expensive, or complex. Figure out why. This works best if the pain happens inside a domain where you have an edge, maps to a real budget or risk, and hides structural change that makes rebuilding newly possible.</p>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/Figma.png" alt="">Figma</div>
-        <p class="o">Founded 2011. $1Bn+ ARR, 13M users, IPO at ~$20Bn.</p>
-        <p>In 2012, design was single-player and offline. Designers used Sketch or Adobe, exported PNGs, emailed them around, collected comments in separate tools. Dylan Field realized browser technology had matured to the point where you could build serious graphics applications entirely in the browser.</p>
-        
-      </div>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/sporebio.png" alt="">Spore Bio</div>
-        <p class="o">Founded 2023 out of EF. Raised over 30M euros including a 22M Series A.</p>
-        <p>Amine Raji spent six years at Nestle watching every step of food production get hyper-optimized, except one: checking for bacterial contamination still relied on growing cultures in Petri dishes. Five-day wait. He met Maxime Mistretta from the Pasteur Institute. They built a system that uses spectral analysis and deep learning to identify contamination in under ten minutes.</p>
-      </div>
-
-      <h3>Ride the wave, but look for what's missing</h3>
-      <p>Major tech shifts create new categories. Start with a platform shift, describe who gains new power and what new behavior becomes normal. List the second-order problems. Pick one missing layer that, if solved, becomes a control point.</p>
-      <p>The companies that win don't just use a new technology. They identify a structural gap that the technology created, and they become the answer to that gap.</p>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/cursor.png" alt="">Cursor</div>
-        <p class="o">Founded 2022. $2Bn+ revenue, 1M+ DAUs, $30Bn+ valuation.</p>
-        <p>By 2022, LLMs could generate and reason about code. Copilot proved the behavior was real. But it was a plugin bolted on top of existing editors. It couldn't understand an entire codebase or coordinate changes across files. Four MIT students forked VS Code and rebuilt it as an AI-native editor.</p>
-      
-      </div>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/datadog.svg" alt="">Datadog</div>
-        <p class="o">Founded 2010. $3.5Bn+ revenue, $42Bn market cap.</p>
-        <p>In 2010, cloud computing was moving from experiment to production. All existing monitoring tools were built for permanent, physical servers. In the cloud, servers appear and disappear constantly. Olivier Pomel and Alexis Le-Quoc built the monitoring system that only made sense in a cloud world.</p>
-    
-      </div>
-
-      <h3>Unbundle and rebundle</h3>
-      <p>Unbundling: take a specific piece of a large product and do it 10x better. Rebundling is more powerful: look at a fragmented system and say this should not be ten steps, ten tools, and ten people. The winner redefines where the workflow lives.</p>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/rippling.png" alt="">Rippling</div>
-        <p class="o">Founded 2012. $1Bn+ revenue, $10Bn+ valuation.</p>
-        <p>Parker Conrad's insight was architectural: the real product wasn't any single module but the unified employee data layer underneath all of them. If you built a single system of record for every employee, every module on top could share data and eliminate fragmentation.</p>
-        
-      </div>
-
-      <h3>Think about which tools could use a network</h3>
-      <p>Look for tools people already use alone, and ask whether the output would become dramatically more valuable if shared. Can you build a version where sharing happens by default, so every new user makes the product better for everyone else?</p>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/Pinterest.png" alt="">Pinterest</div>
-        <p class="o">Founded 2010. 100M+ monthly active users, $2.7Bn+ valuation.</p>
-        <p>Ben Silbermann built a personal bookmarking tool where boards were public by default. When you pinned something, it appeared in feeds. When someone repinned, it spread further. A compounding loop from day one.</p>
-      </div>
-
-      <h2>> What comes after finding the idea?</h2>
-      <p>Your idea is a starting point. What is the smallest thing you can do to validate potential? What is the riskiest assumption? Don't test the easy things. Test the thing that scares you. The winning idea often comes not from the first hunch, but from insights uncovered while testing a hunch that turns out to be wrong.</p>
-
-      <div class="cs">
-        <div class="n"><img class="cs-icon" src="startup_icons/huggingface.png" alt="">Hugging Face</div>
-        <p>Started as a chatbot for teenagers. Two years in, Google released BERT but it was inaccessible to most developers. The team produced a clean, usable PyTorch implementation within a week and open-sourced it. The reaction clarified the real direction: they became the hub where developers share models, datasets, and applications.</p>
-      </div>
-
-      <div class="rl">
-        <div class="rl-t">Recommended reading</div>
-        <a href="https://medium.com/entrepreneurs-first/ideas-pt-i-where-do-ideas-come-from-58ae761800a">Alice Bentinck, "Ideas Pt I: Where do ideas come from?"</a>
-        <a href="https://medium.com/entrepreneurs-first/ideas-pt-ii-finding-your-edge-8808121b591b">Alice Bentinck, "Ideas Pt II: Finding your Edge"</a>
-        <a href="https://sequoiacap.com/article/pmf-framework/">Team Sequoia, "The Arc Product-Market Fit Framework"</a>
-        <a href="https://blog.samaltman.com/idea-generation">Sam Altman, "Idea Generation"</a>
-        <a href="https://www.paulgraham.com/schlep.html">Paul Graham, "Schlep Blindness"</a>
-      </div>
-    </div>
-
-    <!-- 2. MARKET -->
-    <div class="page" id="page-market">
-      <h1>How to pick the right market</h1>
-
-      <p class="pq">"The market matters more than anything else. You cannot out-execute a market that doesn't exist. Markets are a force in startups in the same way gravity is a force in physics. Get the market right or don't build."</p>
-
-      <p>Teams that understand and win a large, urgent market can achieve PMF almost by accident. Teams in unready or tiny markets end up fighting for every customer. A Tier 1 VC will never invest if they don't think you're building in a market that can create at least a decacorn company.</p>
-
-      <h2>Market pull: is this mission-critical?</h2>
-      <p>Market pull is observable spending behavior already being paid to make a critical problem go away. Can you name the current budget line item you are replacing, and who signs for it? If you cannot point to credible spend, you are likely pushing. Today, pull is easy to fake because everyone wants to run AI experiments. Distinguish pilot pull from production pull.</p>
-
-      <h2>Market trajectory: where is it going?</h2>
-      <p>A great market doesn't have to be huge today. It has to become huge and inevitable tomorrow. Treat TAM as a trajectory and a category destiny. Write down the 2-3 forces that make the market expand regardless of you: cost curves collapsing, behavior shifts, regulation opening.</p>
-
-      <h2>Market structure and profit potential</h2>
-      <p>Some enormous markets are structurally awful. The question: if a company wins, does the market structurally want the winner to become the default layer everyone builds around? Ask: if we win, what do we become the default for? Check whether the market structurally wants coordination: network effects, standard-setting, workflow centralization.</p>
-
-      <h2>Distribution asymmetry</h2>
-      <p>Some markets contain an unfair distribution dynamic baked in. The route to growth compounds, cheapens, or self-reinforces instead of remaining brute-force forever. Stripe distributed through developers. Figma spread through individual designers. Cursor proved value directly in use. Check whether usage naturally propagates inside a team, company, or network.</p>
-
-      <h2>Speed of iteration</h2>
-      <p>Short feedback loops and low friction mean faster truth. Can you see conversion? Retention? Expansion? If the market's feedback is noisy, your learning compounding breaks.</p>
-
-      <h2>Market depth</h2>
-      <p>Your wedge sits inside a larger system where expansion is natural. What do you get to own that makes the next product inevitable?</p>
-
-      <h2>Non-consensus thesis</h2>
-      <p>The strongest markets usually look wrong at first. The right question isn't "is this crowded?" It's: what do we believe that most smart people currently disbelieve, and what mechanism makes our belief become true?</p>
-
-      <h2>Why now</h2>
-      <p>Great startups are often bad ideas that became good ideas because a constraint broke. Ask: "Would this have plausibly failed 2 years ago?" If the answer is no, your why-now is weak and you're probably late.</p>
-
-      <h2>Examples of great markets</h2>
-
-      <div class="cs">
-        <div class="n">Stripe</div>
-        <p>Built the financial OS for internet-native businesses. Attached to the growth of internet GDP. Distributed through developers who could adopt without permission. Two young founders with no network competing against PayPal.</p>
-      </div>
-
-      <div class="cs">
-        <div class="n">Scale AI</div>
-        <p>Sits on the critical path of AI: high-quality data and evaluation. Demand grows as a function of model capability, not just adoption. Once embedded in the training loop, switching costs become huge.</p>
-      </div>
-
-      <div class="cs">
-        <div class="n">Cursor</div>
-        <p>The editor is the fundamental control point. If the winning product becomes the default place where engineers read, write, refactor, and delegate work to agents, value concentrates around that layer.</p>
-      </div>
-
-      <div class="rl">
-        <div class="rl-t">Recommended reading</div>
-        <a href="https://pmarchive.com/guide_to_startups_part4.html">Marc Andreessen, "The Only Thing That Matters"</a>
-        <a href="https://blog.eladgil.com/p/how-can-you-tell-if-your-market-is-good">Elad Gil, "How Can You Tell if Your Market Is Good?"</a>
-        <a href="https://sequoiacap.com/article/pmf-framework/">Sequoia, "The Arc Product-Market-Fit Framework"</a>
-        <a href="https://paulgraham.com/ds.html">Paul Graham, "Do Things That Don't Scale"</a>
-      </div>
-    </div>
-
-    <!-- 3. CUSTOMER -->
-    <div class="page" id="page-customer">
-      <h1>Your customer is your boss</h1>
-
-      <p>The type of customer you sell to shapes your entire company: what you build, how you sell, who you hire, how fast you learn, how much capital you need, and how happy you'll be. Most founders think about this too late.</p>
-
-      <h2>Enterprise</h2>
-      <p>Large organizations, 1,000+ employees, $1B+ revenue. ACVs of $100K-$1M+. Sales cycles run 3-18 months with multiple stakeholders. If any one says no, the deal stalls. GTM is relationship-driven and top-down. Land and expand works because it reduces buyer risk. Net dollar retention is the metric that matters most; best-in-class run NDR above 130%. Expect 25-40% of headcount in sales, CS, and solutions engineering.</p>
-
-      <h2>SMB</h2>
-      <p>Companies with fewer than 500 employees. Contracts are small ($1K-$25K/year) but there are millions of them. Sales cycles are days to weeks. The owner evaluates, decides, and pays, sometimes in the same call. GTM is high-velocity and product-led. The challenge is churn: 30-50% annually is common and often structural. Your acquisition engine has to run constantly just to replace lost customers before you start growing.</p>
-
-      <h2>Prosumer</h2>
-      <p>Individual professionals who adopt a product before the company formally procures it. The most powerful GTM motion of the last decade. Nobody asks permission to use Cursor. A developer installs it, feels the speed difference, never goes back. Weeks later, the manager standardizes. 70% of Figma's enterprise deals originated from individual users on free plans.</p>
-      <p>PLG has a hard requirement: the product must be immediately useful to a single user without any network. Cursor had less than 30 people when it hit $100M revenue. The leverage comes from the product, not the salesforce.</p>
-
-      <h2>Consumer</h2>
-      <p>Highest-risk, highest-reward. You compete for the scarcest resource in the world: human attention. Switching cost is zero and competition is infinite. D1 and D7 retention are the only metrics that matter early. DAU/MAU at scale. Consumer is where taste matters most, and where the failure rate is extremely high.</p>
-
-      <h2>Which is right for you?</h2>
-      <p>If you're a young founder with no enterprise network, prosumer/PLG or SMB will give you faster feedback, revenue, and learning. You can move upmarket later. If you're going consumer, be honest: outcomes are binary, and you're competing against everything else a person could be doing.</p>
-
-      <div class="rl">
-        <div class="rl-t">Recommended reading</div>
-        <a href="https://medium.com/craft-ventures/enterprises-vs-smbs-whos-the-better-customer-for-b2b-saas-startups-9a0d4efe69e9">Craft Ventures, "Enterprises vs SMBs"</a>
-        <a href="https://www.lennysnewsletter.com/p/what-is-good-retention-issue-29">Lenny Rachitsky, "What is good retention"</a>
-        <a href="https://a16z.com/16-startup-metrics/">a16z, "16 Startup Metrics"</a>
-      </div>
-    </div>
-
-    <!-- 4. DISCOVERY -->
-    <div class="page" id="page-discovery">
-      <h1>How to do effective customer discovery</h1>
-
-      <p>Customer discovery means talking to the people you think you're building for. It sounds simple but it isn't. Humans are polite and confusing, founders are biased, and there is a lot of noise. You need a system.</p>
-
-      <h2>Validate 5 things, in order</h2>
-
-      <h3>1. ICP</h3>
-      <p>"Small businesses" or "developers" is not an ICP. You need at least three specific, measurable attributes. Gusto started with six: companies with five or fewer employees, in California, offering no benefits, only salaried employees, no contractors, willing to wait eight days after running payroll. Talk to 20-40+ people. Look for who leans in.</p>
-
-      <h3>2. Problem</h3>
-      <p>Understand exactly what they're struggling with, in their words, in their workflow. How much is it costing them? Go deep on impact and daily reality.</p>
-
-      <h3>3. Promise</h3>
-      <p>"You currently spend 5 days waiting for bacterial test results. With us, you get results in 10 minutes." Good promises are quantified. Test it in conversations before building. If nobody says "when can I have this?" you have a promise problem, not a product problem.</p>
-
-      <h3>4. Price</h3>
-      <p>Testing willingness to pay separates real demand from polite curiosity. Use commitment tests. Throw out a deliberately high number. They'll tell you their ceiling.</p>
-
-      <h3>5. Product</h3>
-      <p>Only once you've validated 1-4. Don't invest substantial time or money before you're confident on the first four.</p>
-
-      <h2>Extract behavior, not opinions</h2>
-      <p>If you're getting compliments, you're doing it wrong. What counts as data is behavior: concrete things people have actually done. Talk about their life, not your idea. Ask about the past, not the future.</p>
-
-      <h3>Five questions you can always ask</h3>
-      <ol>
-        <li><strong>"What is the hardest part about doing X?"</strong> Gets to the core pain.</li>
-        <li><strong>"Tell me about the last time you encountered that problem."</strong> Forces a specific story.</li>
-        <li><strong>"Why was that hard?"</strong> Gives you your marketing copy. Pay attention to exact words.</li>
-        <li><strong>"What have you done to try to solve it?"</strong> Reveals actual competitors and qualifies seriousness.</li>
-        <li><strong>"What don't you love about those solutions?"</strong> Grounded in real experience.</li>
-      </ol>
-
-      <h2>How to know if customers are serious</h2>
-      <p>Commitment is measured by what someone gives up, not what they say. Money is much better than time. Ask the question you're terrified to ask. Bad signals: "Send me the link when it's ready." Good signals: paid pilot, introductions, shared proprietary data, unprompted pricing questions, describing their implementation plan before you finish the demo.</p>
-
-      <div class="rl">
-        <div class="rl-t">Recommended reading</div>
-        <a href="https://www.momtestbook.com/">Rob Fitzpatrick, "The Mom Test"</a>
-        <a href="https://www.youtube.com/watch?v=z1iF1c8w5Lg">YC, "How To Talk To Users"</a>
-        <a href="https://review.firstround.com/how-to-know-if-your-ideas-the-right-one-a-founders-guide-for-successful-early-stage-customer-discovery/">First Round, "Successful Early-Stage Customer Discovery"</a>
-        <a href="https://www.lennysnewsletter.com/p/how-to-identify-your-ideal-customer">Lenny Rachitsky, "How to identify your ICP"</a>
-      </div>
-    </div>
-
-    <!-- 5. OUTREACH -->
-    <div class="page" id="page-outreach">
-      <h1>How to do effective outreach</h1>
-
-      <p>Outreach is a pipeline you build to repeatedly reach the right people, run good conversations, and convert the best ones as customers.</p>
-
-      <h2>Mental models</h2>
-      <p>High-quality early outreach is manual, long, and painful. Under no circumstances should you outsource or automate this in early stages. Think of outreach as a measurement system for "do people care enough about my problem?" Build the funnel backwards: start from "I need 3 pilots in month 1" and work backward through conversion rates.</p>
-
-      <h2>Step 1: Start warm</h2>
-      <p>First conversations come from people you already know. Former colleagues, classmates, alumni, fellow founders. When asking for intros: identify the specific person, write a self-contained forwardable email readable in under 45 seconds, respond immediately when connected, close the loop with the introducer. At the end of every conversation: "Is there anyone else you think I should talk to?"</p>
-
-      <h2>Step 2: Cold outreach</h2>
-      <p>Keep it very short. Five to seven sentences, readable on a phone without scrolling. Single specific ask. Write like a human. Establish credibility in one line. Make it about them. Follow up 2-3 times. LinkedIn: connection requests with no message have higher acceptance rates. Volume limits: 20-30/day max.</p>
-
-      <h2>Step 3: Go where your customers live</h2>
-      <p>In-person events convert dramatically higher than any digital channel. Trade shows, conferences, meetups. Tracy Young went to construction sites with doughnuts. Scale AI went to CVPR with laptops, pitching booth to booth without a booth. Online: Reddit, HN, Slack groups, Discord channels, industry forums. Participate genuinely first.</p>
-
-      <h2>How much is enough?</h2>
-      <p>Most founders dramatically underestimate volume. A typical funnel: 800 emails, 400 opened, 40 responses, 10 demos, 1 customer. Block 3-4 hours per day for outreach only. Start manual. Never automate before you've validated the message by hand.</p>
-
-      <h2>Founder stories</h2>
-      <div class="cs">
-        <div class="n">Stripe</div>
-        <p>Patrick Collison would say "give me your laptop" and set up integration on the spot. By the end of the conversation, the founder was a customer.</p>
-      </div>
-      <div class="cs">
-        <div class="n">Pinterest</div>
-        <p>Ben Silbermann changed all the Apple Store display computers to show Pinterest, then stood in the back and watched people react.</p>
-      </div>
-      <div class="cs">
-        <div class="n">Snyk</div>
-        <p>Ran vulnerability checks on prospects before reaching out: "I found 5 unprotected endpoints on your public API. Here's the list."</p>
-      </div>
-    </div>
-
-    <!-- 6. INTRO -->
-    <div class="page" id="page-intro">
-      <h1>How to introduce yourself</h1>
-
-      <p>Your introduction is the most important two minutes of your early founder life, and most people waste it. You will give this intro hundreds of times: to potential cofounders, customers, investors, and people you want to hire.</p>
-
-      <h2>The European intro vs the US intro</h2>
-
-      <p class="pq">"Hello, my name is Charlie Songhurst. After reading PPE at Oxford, I started at McKinsey in London. Afterwards, I joined Microsoft where I headed Strategy. I moved to San Francisco where I angel invest."</p>
-
-      <p>Polite, accurate, and completely forgettable. Now the US version:</p>
-
-      <p class="pq">"Hi, I'm Charlie. After Oxford, I got my first job at McKinsey earning $200K a year. Two years later, Microsoft offered me GM London at $2M yearly. I started investing in crypto, turned a few hundred Ks into my first billion. Today I'm one of the most prolific angel investors in SF. I sit on the Board of Meta. I've seen it all."</p>
-
-      <p>Numbers, specifics, outcomes. Almost no adjectives. No "I was fortunate to." Just facts and data.</p>
-
-      <h2>Tips</h2>
-      <p><strong>Lead with the strongest thing, not the first thing.</strong> If the most impressive fact about you is that you built a product used by 2 million people, say that first. You earn each additional second of attention. If you bury your best material at the end, they've already tuned out.</p>
-      <p><strong>Use accomplishments rather than titles.</strong> "I was a PM at Stripe" tells someone where you sat. "I built the billing infrastructure that processes $50B+ in recurring revenue for Stripe's SaaS customers" tells them what you can do. Titles are forgettable. Specific things you built, shipped, or achieved are not.</p>
-    </div>
-
+  <div class="cs">
+    <div class="n">Pinterest</div>
+    <p>Pinterest's Ben Silbermann used to walk by the Apple Store, change all the display computers to show Pinterest, then stand in the back and watch people react.</p>
+  </div>
+
+  <div class="cs">
+    <div class="n">Photoroom</div>
+    <p>Photoroom's founders used to go to McDonalds, and pay for a free hamburger to the people willing to test their app as they were in line or eating.</p>
+  </div>
+
+  <div class="cs">
+    <div class="n">Snyk</div>
+    <p>Snyk ran vulnerability checks on prospects before reaching out: "I found 5 unprotected endpoints on your public API: here's the list and what I'd recommend." For your first 10-20 targets, it converts at a dramatically higher rate than any email.</p>
+  </div>
+
+  <div class="rl">
+    <div class="rl-t">Recommended reading</div>
+    <a href="#">Aaron Epstein / YC, "How to Write Cold Emails That Convert" (Startup School)</a>
+    <a href="#">Andy, "The Art of Cold-Emailing a Billionaire"</a>
+    <a href="https://paulgraham.com/ds.html">Paul Graham, "Do Things That Don't Scale"</a>
+    <a href="#">Lenny Rachitsky, "How to Kickstart and Scale a Consumer Business"</a>
+    <a href="#">First Round Review, "Retool's Path to Product-Market Fit"</a>
+    <a href="https://review.firstround.com/the-power-of-interviewing-customers-the-right-way-from-twitters-ex-vp-product/">First Round Review, "Get in the Van" (Michael Sippey)</a>
   </div>
 </div>
+
+<div class="page" id="page-intro">
+  <h1>How to introduce yourself so that everyone listens</h1>
+
+
+  <p>Sometimes, your introduction will be the most important two minutes of your early founder life. You will give this intro hundreds of times: to potential cofounders, customers, investors, people you want to hire, etc. You should spend time drafting this intro, so that it lands and makes you absolutely memorable. The goal is to be so clear and so specific that people remember you, and want to listen to what you have to say out of a sea of people.</p>
+
+  <h2>The European intro vs the US intro</h2>
+
+  <p><a href="https://www.linkedin.com/in/charlessonghurst/">Charlie Songhurst</a> is a great friend and investor of Entrepreneurs First and The Bridge, and you'll likely get to meet him as part of your journey with us. Charlie is English but has been living in San Francisco for decades. He often helps explain the importance of "the intro", and the difference in communication style between what to say in Europe vs in the US. Here's how he frames it using his own background:</p>
+
+  <p><strong>Charlie's UK intro:</strong> "Hello, my name is Charlie Songhurst. After reading PPE at Oxford, I started out my career at McKinsey in London where I worked with several enterprise clients on various costly subjects. Afterwards, I joined Microsoft where I headed strategy in the UK. I then moved to San Francisco where I now still live, and where I angel invest in early-stage companies of all different types of industries. I also sit on the board of Meta."</p>
+
+  <p><strong>Charlie's US intro:</strong> "Hi, I'm Charlie Songhurst. After studying at Oxford, I got my first job at McKinsey earning $200K a year. Two years later, after writing a strategy document that got picked up by Steve Ballmer, I was offered to join Microsoft as GM London on a $2M yearly salary, eventually becoming Head of Corporate Strategy where I tried to buy Yahoo. I invested $100k in Bitcoin in 2013, and when it exploded I became a billionaire a few years later. I'm now one of the world's most prolific angel investors - to date I've made over 600 investments from my base in San Francisco. At the start of 2025 I was appointed to the Board of Meta where I advise Mark Zuckerberg on Meta's AI strategy and other big topics. I've seen it all. It's great to meet you."</p>
+
+  <p>We're not all Charlies (yet). But look at how much more impactful the US version of his intro is. The first version is a chronological recitation of job titles: polite, accurate, and completely forgettable. The second uses numbers, specifics, and outcomes. And notice: there are almost no adjectives. No "I was fortunate to" or "I had the privilege of." Just facts, data, and a more compelling and precise way to structure the same story.</p>
+
+  <p>When you craft your intro, try to lead with the strongest thing, not the first thing. Most people default to chronological order: school, first job, second job, current thing. But if the most impressive fact about you is that you built a product used by 2 million people, say that first. You earn each additional second of someone's attention. If you bury your best material at the end, they've likely already tuned out.</p>
+
+  <p>Also, try to be yourself and add your flavor. That's what will make your intro uniquely you, which will likely be more memorable.</p>
+</div>
+
+<div class="page" id="page-cofounding">
+    <h1>Co-founding</h1>
+
+
+    <p>Finding a great co-founder is hard, but arguably the most important element to get right when building a company.</p>
+
+    <p>In the real world, finding a co-founder comes with high transaction costs - searching, bargaining, evaluating. The Bridge introduces norms that reduce these transaction costs to give you an unfair advantage: a curated room of potential people to work with, alongside structure and frameworks to set standards and judge progress.</p>
+
+    <p>But The Bridge is an unusual environment, even for seasoned founders - if you've built a company before it's unlikely to have been with a stranger, in a house full of other strangers, on an 8-week timeframe. This document outlines how you should think about finding a long-term teammate in this context.</p>
+
+    <h2>Important things to note</h2>
+
+    <ul>
+        <li><strong>The right cofounder is far more important than any one idea.</strong> Don't become so attached to a single idea that you lose the opportunity to work with an exceptional individual on something exciting.</li>
+        <li>The Bridge frameworks and environment have been designed to amplify your chances of finding the right cofounder. <strong>See them as tools for <em>focus</em> and <em>prioritisation</em></strong>, rather than restrictions on what you can build.</li>
+        <li><strong>Making fast, high quality decisions with limited information is the key</strong> - you are never going to have perfect information on every founder in the cohort, and you're setting yourself up for failure if you attempt to. Your team selection doesn't need to be perfect first time - this is the beauty of The Bridge environment. The threshold for breaking a team is low - if it's not working for any reason, discuss and if the issue is unsolvable issue break the team and move on.</li>
+        <li><strong>Every second you are in an unproductive team without a clear edge, mission, or insight you are wasting time that could be spent building a company with someone else.</strong></li>
+        <li><strong>Don't play the game</strong> of "if I give the impression of being in a strong team then maybe I'll get investment in Week 9, and we can figure it out later". The prize of this pie-eating contest is more pie! All you're doing is locking yourself into that team for good - the only person you're cheating is yourself. Everything is opportunity cost.</li>
+    </ul>
+
+    <p>The guidance below is just that. There are many ways to build a team, and if these frameworks don't work for your context we can help you think through options. <u>There are no rules.</u></p>
+
+    <h2>What to look for in a co-founder</h2>
+
+    <h3>Complementary skillsets</h3>
+
+    <p>People are naturally drawn to others that are similar to themselves. Those that have studied the same subject, like the same things, have built the same products. There's plenty to talk about and the conversation feels natural. Surely this is what you've been looking for! Unfortunately not. You're likely to be wrong if you look for social cues, instead of looking at who you can be most productive with. You don't want to duplicate yourself, but instead build with someone that brings something to the table that you cannot. In this way you both come up with ideas that wouldn't have been possible without your discrete knowledge, and move faster than would have been possible with a carbon copy of yourself.</p>
+
+    <h3>Ease of ideation</h3>
+
+    <p>Teambuilding & ideation are symbiotic, they can't be separated. The same idea with a different co-founder will become a completely new idea. Your ability to bounce ideas around and explore new avenues with someone is indicative of co-founder potential - if you build a company together you'll constantly need to creatively think your way out of problems together.</p>
+
+    <h3>Deep mutual respect</h3>
+
+    <p>The best co-founding teams feel equally lucky to be working with the other. Each person feels like their cofounder is out of their league. They can't believe they landed the best person in the cohort. You're looking for someone for whom you have a deep respect for - their skills, knowledge, ability, character - and who you trust to execute on their part of the business.</p>
+
+    <h3>Shared values</h3>
+
+    <p>Everyone wants to build a company for a different reason. Making sure you're aligned with your co-founder on the type of organization you want to create and why is an important foundation to set.</p>
+
+    <p>Until you have worked closely with someone you have little data on what they might be like as a potential co-founder. If you feel like you have an interesting starting point, some testable hypotheses, a good skills overlap and a good read on their values: jump into a team.</p>
+
+    <h2>What does great feel like?</h2>
+
+    <ul>
+        <li><strong>Good co-founding relationships have a multiplier effect.</strong> It's not just that you get on and work well together, but you can achieve orders of magnitude more than the two of you working separately could. You make more concrete progress together than apart. You're lifted by being a part of the team. You can feel it quickly; often within 24-48 hours. <u>If you don't feel excited, driven and grateful within 2 days, it's likely not the right team.</u></li>
+        <li><strong>Productivity is traction for teams.</strong> If you're productive together (learning rapidly, validating and invalidating hypotheses), this is signal on team quality.</li>
+        <li><strong>The best teams just move faster.</strong> Each time they check in with an advisor they're asking different questions - either they've answered all their previous ones or have developed the idea to the point that those questions are no longer relevant. Speed is the key differentiator between teams that win and those that lose.</li>
+    </ul>
+
+    <p>If you find yourself looking around the room and being jealous of other teams, you're probably in the wrong team yourself.</p>
+
+    <h2>Common traps</h2>
+
+    <ul>
+        <li><strong>Avoid pitching your ideas immediately to potential co-founders.</strong> Lead with your skills and experience to keep the surface area of possible things to work on as broad as possible. You would be surprised how many people end up working on something they never expected purely because they kept an open mind.</li>
+        <li><strong>Falling in love with your cofounder.</strong> Not literally… You may find that you've developed a strong relationship with a co-founder but haven't managed to hit on any exciting starting points or ideas. You keep 'pivoting' but really are jumping from undifferentiated idea to undifferentiated idea in an effort to keep the team together. This is often paired with the unshakeable view that there isn't anyone better for you in the cohort; you vibe well and have met each other's partners - why not keep working together? The tough reality is that you cannot separate teambuilding and ideation - if you're not making constant linear ideation progress with a co-founder, it's likely not the right pair.</li>
+        <li><strong>Chasing a "spark".</strong> It's rare that lightning strikes and you know immediately when you've found the right co-founder. That feeling of the 'right' match can develop over a prolonged period of high intensity work together. Rapidly cycling through ideation sessions with many different people until you feel a 'spark' runs the risk of missing relationships with the potential to grow into strong teams.</li>
+        <li><strong>Letting productivity mask underlying problems.</strong> When you're making great progress on an idea it can be extremely tempting to ignore underlying issues in the team to avoid rocking the boat. This is a mistake - team issues <em>always</em> resurface later, and the longer you leave them the more catastrophic they will be. Have a difficult conversation, try and address the issues, and move on from the team if it's not resolvable.</li>
+        <li><strong>Not spending time getting to know your cofounder on a personal level.</strong> If you get this relationship right, you'll be on a 10+ year journey together. You should spend time getting to know who your co-founder is and what makes them tick. Just because you're not looking for a friend doesn't mean they can't become one! This list of 50 questions from First Round (Tier Seed VC) is a good place to start.</li>
+    </ul>
+
+    <h2>The Bridge teambuilding norms</h2>
+
+    <p>There are many ways to build companies, but from our 15 years of experience constructing them in this environment, we recommend the following:</p>
+
+    <ul>
+        <li><strong>Teams of two.</strong> Selecting one co-founder is hard. Selecting two is even harder. Adding a third co-founder into the dynamic triples the number of relationships that need to be managed within the team. Often two co-founders end up wanting to go in one ideation direction, while the remaining founder tries to go in another. It's very rare (but not out of the question) that you <em>actually</em> need the skills of a 3rd co-founder in the team from Day 1 - it's also the most expensive decision you will ever make. Ask yourself - is this extra person worth parting with 1/3 of my company? Can we reach seed without them and hire in any missing skills?</li>
+        <li><strong>100% commitment to the team you're in.</strong> It's impossible to truly test a team unless you're all-in. Avoid working with multiple people for prolonged period of times simultaneously; you won't get useful signal. Pick a team, set a timeframe, and test with 100% focus.</li>
+        <li><strong>Co-founders should work in the same place - try not to separate in the early days.</strong> It can be tempting to divide and conquer to cover more ground separately, but remember you're not just testing your idea, you're also testing the team. By all means run different streams of work, but try and be physically together for as much of the early months as possible.</li>
+        <li><strong>We celebrate breakups. Time to breakup matters.</strong> One of the most counter-intuitive elements to The Bridge is that team breakups aren't something to be disappointed by, they're celebrated. Ultimately everyone in the cohort is here for the same thing, to figure out <em>who</em> to work with and on <em>what</em> - if a match isn't the right fit, for any reason, then it's in everyone's interest to address the issue and free each other back up. A classic error is to hold onto a team for weeks longer than you should have in the hope things will improve on their own - don't be afraid to move quickly.</li>
+        <li><strong>50:50 Share Split.</strong> Everyone is here to share in the creation of a business, both in the idea and also in equity. The vast majority of the company's lifetime is ahead of you, so even if you have entered The Bridge with a clear idea and some early progress it rarely makes sense to explore an uneven founder share split. There are exceptions, but we suggest this as a default.</li>
+    </ul>
+
+    <h2>Assessing your team on an ongoing basis - having hard conversations</h2>
+
+    <p>From the beginning it's crucial to get in the habit of constantly assessing how <em>happy</em> and <em>productive</em> you are in your team.</p>
+
+    <p>It's important to remember that even if the intensity of your relationships means you quickly feel close to the person you're working with, you are lacking essential context that close family and friends will have about each of you; context built on years of understanding you and the events that happen around you. Never underestimate the ability of people to surprise you!</p>
+
+    <p>It's easy to become complacent once you feel like you've hit on <em>the</em> idea and forget to keep working on the team relationship. <strong>But your team is the most important asset you have.</strong> It requires constant work and proactive monitoring.</p>
+
+    <h3>Why do teams break up?</h3>
+
+    <p>We have created a norm at The Bridge where it is encouraged, even required, that you address the points below in some of the earliest conversations with your cofounder. Many of these might seem immediately uncomfortable, personal and private - co-founding with anyone, let alone a stranger, requires full honesty and transparency from the earliest possible moment of working together.</p>
+
+    <h3>Roles & responsibilities</h3>
+
+    <p>What will each of you eventually spend your time on?</p>
+
+    <p>One of the biggest reasons for breakdowns in co-founder relationships is misalignment on what each founder will eventually spend their time doing in the future. Do you your skillsets overlap too much? Do you both want to be doing the same activities? For some teams it is really clear from the outset who will be doing what. For others, especially those teams where there are overlapping skill sets, if this hasn't been discussed / is loosely defined it can create future problems.</p>
+
+    <p>We recommend drawing out a venn diagram with your co-founder and writing down which areas you think your abilities are most naturally drawn to, where you each excel. Ideally, it'll be complementary and balanced, knowing very well that this will change over time and that some skills and abilities you'll eventually need to hire for. You should have enough between you both as a core in order to move fast and be productive.</p>
+
+    <p>If however you are complementary but don't have enough core abilities to be productive, you need to have a hard conversation with your cofounder and talk it through.</p>
+
+    <p>Too much overlap will stall progress and cause friction and tension. This can be the most insidious setup if not addressed up-front; the most likely to cause a late-stage team break-up when there is more on the line than a few days work.</p>
+
+    <h3>Personalities, incentives</h3>
+
+    <p>You're all here because you want to build a generational company. Why is this important to you, and why is it important to your cofounder? This will differ for everyone. Is it a sense of self? Is it ego based? Is it monetary? Is it to change a world? To solve just that one problem?</p>
+
+    <p>Do you know what makes your co-founder tick? What makes your cofounder happy? How they deal with stressful situations? Resolve conflict? Have you met each others' partners or families? If your customers end up in a different geography, would you move? What is your financial runway?</p>
+
+    <p>Personality clashes can happen in teams that look the strongest. Productivity is high, so rather than rocking the boat with a tough conversation about a personality clash, the co-founders let it go unspoken.</p>
+
+    <p>It's often hard for anyone outside the team to detect this, but you can. Act on it.</p>
+
+    <h3>Working styles, culture, values</h3>
+
+    <p><strong>You can be deliberate about team culture.</strong> This doesn't mean writing a mission statement and culture document on Day 1. But you have an opportunity to develop positive team norms and culture from the beginning. It is never too early to have these conversations and get a deeper understanding of how the other wants to work.</p>
+
+    <p>A good probing question is to ask what type of culture your cofounder wants to create? <strong>"It would make you proud to hear people describe your company's culture as…."?</strong></p>
+
+    <p>Do you understand how your cofounder likes to work? There are no right or wrong answers. You might even have opposing answers and that's okay - see this as a data gathering exercise to give you the strongest possible foundation for moving forward:</p>
+
+    <ul>
+        <li>What is your preferred method of communication?</li>
+        <li>How do you measure productivity?</li>
+    </ul>
+
+    <h3>Monitoring team health</h3>
+
+    <p><strong>Just as you are evaluating product and commercial progress in your team, you must be evaluating team health -</strong> especially important when you are getting to know each other.</p>
+
+    <p>Feedback is the most powerful tool to keep your team healthy - critical for 2 reasons:</p>
+
+    <ul>
+        <li>The obvious: if something is annoying you, aggravating you, giving feedback allows you to fix that problem before it becomes a big issue.</li>
+        <li>The less obvious: in a large organisation, there are mechanisms to support your professional development. Performance reviews, peer appraisals, 360 degree feedback. In a two-person team, none of those exist - you are each other's boss, peer and direct reports all rolled into one. You are everything to your co-founder. You need to be 100% committed to their development. As a co-founder, you have an obligation to help them be the best possible leader within the company that they can be. And the way that you do that is by giving feedback. You are the only people who know what the other is great, good and bad at.</p>
+    </ul>
+
+    <p><strong>Issues won't 'sort themselves out' down the line (especially as pressure increases).</strong> They only get bigger and harder to fix and face once more is on the line, you've raised money, hired a team, etc.</p>
+
+    <p><strong>Few prioritise this, but learning how to give (and receive) feedback to your co-founder often and effectively will change the trajectory of your team.</strong> It helps you focus on building a globally important company rather than just jumping through the next hoop.</p>
+
+    <p>Feedback is a gift, and a concrete skill you can develop.</p>
+
+    <h3>Principles for feedback</h3>
+
+    <p>You are providing guidance, which involves a mix of praise as well as criticism</p>
+
+    <p><strong>Practice Radical Candor.</strong> Say what you really think while also caring about the person you're saying it to. Challenging people directly is often the best way to show you care. Helpful reading <a href="https://medium.com/swlh/how-to-be-a-better-leader-by-developing-radical-candor-2c08db3ff5d7" target="_blank">here</a>.</p>
+
+    <p><strong>Regularity of feedback matters.</strong> A recurring 'space' to air concerns/challenges can force you to work through things that you might not have done otherwise, meaning small issues don't snowball into bigger challenges. Regular feedback also mitigates 'heat of the moment' tensions. Put this in the calendar every day or two to begin with, then every week as the team progresses.</p>
+
+    <p><strong>Quality of feedback matters. It's important to remember there will be a <em>gap between intention and effect</em> in your communication.</strong> You intend one thing, but the effect can be something totally different.</p>
+
+    <p>This gap exists even between people that know each other very well, so is particularly exacerbated among strangers.</p>
+
+    <p>What you mean to say is within your control, but how it comes across / is interpreted is not. This gap often leads to the biggest breakdowns in communication and trust between co-founders. It's always best to over clarify what you mean. A helpful heuristic: don't believe everything you think!</p>
+
+    <h3>Feedback models</h3>
+
+    <p>To make sure feedback remains objective (and not a personal attack) it can sometimes be helpful to follow a defined structure. There are many models but here are a few we have found helpful:</p>
+
+    <ul>
+        <li>OEPS - Observe > Effect > Pause > Suggest
+            <ul>
+                <li>"I observe…"</li>
+                <li>"It had this effect…"</li>
+                <li>"I suggest…"</li>
+            </ul>
+        </li>
+        <li>SKS - Stop > Keep > Start</li>
+        <li>Stanford - I like > I wish > What if</li>
+    </ul>
+
+    <p>If you find this tough, try the following questions...</p>
+
+    <ul>
+        <li>When I say 'team dynamic', what's the first thing that comes into your head? Even someone's body language in response to this can be useful!</li>
+        <li>On a scale of 1-10, how happy do you currently feel in our team?
+            <ul>
+                <li>This is useful because it gives a numerical score that you can track over time. It may seem counterintuitive to put emotions/feelings into numbers but it can often be a less awkward way to trigger / begin a conversation. <strong>This is a very powerful tool.</strong></li>
+            </ul>
+        </li>
+        <li>What do you think your cofounder has found most difficult this week?
+            <ul>
+                <li>Answer this in front of each other. It can be super effective as it's less confrontational than saying "what have I done this week that's shit?". It forces you to be self-reflective and can lead to incredibly valuable / productive conversations.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <p>The goal is to get to a place where you and your co-founder have built a code of signals between each other - you understand how the other one communicates, gives feedback and likes to receive it back. Close that gap between intention and effect.</p>
+
+    </div>
+  </div>
 
 <script>
 function show(id) {
