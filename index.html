@@ -41,6 +41,16 @@
     .rl .rl-t { font-family: var(--athiti); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; opacity: 1; margin-bottom: 0.5rem; }
     .rl a { display: block; font-family: var(--athiti); font-size: 0.8rem; font-weight: 300; color: #000; text-decoration: none; opacity: 1; padding: 0.2rem 0; transition: opacity 0.15s; }
     .rl a:hover { opacity: 0.5; }
+    .page a { color: #000; text-decoration: underline; text-underline-offset: 3px; }
+    .page a:hover { opacity: 0.5; }
+    .mail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+    .mail-overlay.active { display: flex; }
+    .mail-modal { background: #fff; border: 1px solid #000; padding: 2rem 2.5rem; max-width: 360px; width: 90%; font-family: var(--athiti); }
+    .mail-modal h3 { font-family: var(--lora); font-weight: 400; font-size: 1.3rem; margin-bottom: 1.2rem; }
+    .mail-modal a { display: block; font-family: var(--athiti); font-weight: 300; font-size: 0.95rem; color: #000; text-decoration: none; padding: 0.6rem 0; border-top: 1px solid #000; }
+    .mail-modal a:hover { opacity: 0.5; }
+    .mail-modal .close { margin-top: 1rem; font-size: 0.75rem; cursor: pointer; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.1em; }
+    .mail-modal .close:hover { opacity: 1; }
     @media (max-width: 768px) {
       .shell { flex-direction: column; }
       .sidebar { width: 100%; min-width: unset; height: auto; flex-direction: row; align-items: center; gap: 1.5rem; padding: 1.5rem; }
@@ -55,31 +65,32 @@
 <body>
   <div class="shell">
     <div class="sidebar">
-      <div class="logo">
+      <div class="logo" onclick="show('index')">
         <img src="The Bridge.png" alt="The Bridge">
       </div>
       <nav>
-        <a onclick="show('idea')" id="nav-idea">1. How to find your idea</a>
-        <a onclick="show('market')" id="nav-market">2. How to pick the right market</a>
-        <a onclick="show('customer')" id="nav-customer">3. Your customer is your boss</a>
-        <a onclick="show('discovery')" id="nav-discovery">4. Customer discovery</a>
-        <a onclick="show('outreach')" id="nav-outreach">5. Effective outreach</a>
-        <a onclick="show('intro')" id="nav-intro">6. How to introduce yourself</a>
-        <a onclick="show('cofounding')" id="nav-cofounding">7. Building your co-founding team</a>
+        <a onclick="show('idea')" id="nav-idea">How to find your idea</a>
+        <a onclick="show('market')" id="nav-market">How to pick the right market</a>
+        <a onclick="show('customer')" id="nav-customer">Your customer is your boss</a>
+        <a onclick="show('discovery')" id="nav-discovery">Customer discovery</a>
+        <a onclick="show('outreach')" id="nav-outreach">Effective outreach</a>
+        <a onclick="show('intro')" id="nav-intro">How to introduce yourself</a>
+        <a onclick="show('cofounding')" id="nav-cofounding">Building your co-founding team</a>
+        <a onclick="show('contact')" id="nav-contact">Contact us</a>
       </nav>
     </div>
     <div class="main">
 
       <!-- INDEX PAGE -->
       <div class="page active" id="page-index">
-        <h1>Index</h1>
-        <p>Written documents are the best way to deliver key information to everyone - so that we know that everyone in the cohort has a baseline understanding of key information. We should have one written version of each talk that has more detailed information. These written documents will be shared with the founders ahead of each talk, in the beginning of the program.</p>
+        <h1>The Mission book</h1>
+        <p>This is a series of docs we've written to give you the best possible foundation for building your company. Each one covers a topic we think is essential.</p>
+        <p>More docs may be added during the program based on what the cohort needs. If there's a topic you want us to go deeper on, <a href="#" onclick="openMail(event)">tell us</a>.</p>
       </div>
 
       <!-- PAGE 1: HOW TO FIND YOUR IDEA -->
       <div class="page" id="page-idea">
         <h1>How to find your idea</h1>
-
         
         <p>The purpose of this doc is to give you prompts that can help you find your startup idea. Before we start, there are two important things to know about this topic.</p>
         
@@ -1176,7 +1187,19 @@
     </div>
   </div>
 
+  <div class="mail-overlay" id="mailOverlay" onclick="if(event.target===this)closeMail()">
+    <div class="mail-modal">
+      <h3>Send us a note</h3>
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=operations-thebridge@joinef.com&su=The%20Mission%20book%20%E2%80%94%20topic%20request" target="_blank" rel="noopener">Gmail</a>
+      <a href="https://outlook.office.com/mail/deeplink/compose?to=operations-thebridge@joinef.com&subject=The%20Mission%20book%20%E2%80%94%20topic%20request" target="_blank" rel="noopener">Outlook</a>
+      <a href="mailto:operations-thebridge@joinef.com?subject=The%20Mission%20book%20%E2%80%94%20topic%20request">Default mail app</a>
+      <div class="close" onclick="closeMail()">Close</div>
+    </div>
+  </div>
+
 <script>
+function openMail(e) { e.preventDefault(); document.getElementById('mailOverlay').classList.add('active'); }
+function closeMail() { document.getElementById('mailOverlay').classList.remove('active'); }
 function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
